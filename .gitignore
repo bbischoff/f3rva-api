@@ -1,2 +1,5 @@
+.vscode/
 vendor/
+public/test.php
+
 .env

@@ -1,0 +1,45 @@
+<?php
+namespace Src\F3\Model;
+
+class Summary implements \JsonSerializable {
+	private $id;
+	private $description;
+	private $value;
+	
+	public function getId() {
+		return $this->id;
+	}
+	
+	public function setId($id) {
+		$this->id = $id;
+	}
+	
+	public function getDescription() {
+		return $this->description;
+	}
+	
+	public function setDescription($description) {
+		$this->description = $description;
+	}
+	
+	public function getValue() {
+		return $this->value;
+	}
+	
+	public function setValue($value) {
+		$this->value = $value;
+	}
+
+	public function jsonSerialize()
+	{
+		return [
+			'summary' => [
+				'id' => $this->getId(),
+				'description' => $this->getDescription(),
+				'value' => $this->getValue()
+			]
+		];
+	}
+}
+
+?>
