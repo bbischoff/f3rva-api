@@ -59,38 +59,39 @@ class WorkoutResource {
 
     private function getAllWorkouts()
     {
-        // $result = $this->personGateway->findAll();
-
-        $result = array(
-            1 => array ('firstName' => 'Sarah', 'age' => 42),
-            2 => array ('firstName' => 'Brian', 'age' => 42),
-            3 => array ('firstName' => 'Allison', 'age' => 14),
-            4 => array ('firstName' => 'Justin', 'age' => 12),
-            5 => array ('firstName' => 'Sam', 'age' => 7)
-        );
+        $result = $this->workoutService->getWorkouts();
 
         $response['status_code_header'] = 'HTTP/1.1 200 OK';
         $response['body'] = json_encode($result);
+
         return $response;
     }
 
     private function getWorkout($id)
     {
-        // $result = $this->personGateway->find($id);
-        // if (! $result) {
-        //     return $this->notFoundResponse();
-        // }
-
-        // $result = array ('workoutId' => $id, 'title' => 'some spider run workout');
-        
         $result = $this->workoutService->getWorkout($id);
+        $response = null;
 
-        $response['status_code_header'] = 'HTTP/1.1 200 OK';
-        $response['body'] = json_encode($result);
+        if (!is_null($result)) {
+            $response['status_code_header'] = 'HTTP/1.1 200 OK';
+            $response['body'] = json_encode($result);
+        }
+        else {
+            $response = $this->notFoundResponse();
+        }
 
         return $response;
     }
 
+    private function notFoundResponse()
+    {
+        $response['status_code_header'] = 'HTTP/1.1 404 Not Found';
+        $response['body'] = null;
+
+        return $response;
+    }
+
+    /*
     private function createUserFromRequest()
     {
         $input = (array) json_decode(file_get_contents('php://input'), TRUE);
@@ -130,33 +131,8 @@ class WorkoutResource {
         $response['body'] = null;
         return $response;
     }
+    */
 
-    private function validatePerson($input)
-    {
-        if (! isset($input['firstname'])) {
-            return false;
-        }
-        if (! isset($input['lastname'])) {
-            return false;
-        }
-        return true;
-    }
-
-    private function unprocessableEntityResponse()
-    {
-        $response['status_code_header'] = 'HTTP/1.1 422 Unprocessable Entity';
-        $response['body'] = json_encode([
-            'error' => 'Invalid input'
-        ]);
-        return $response;
-    }
-
-    private function notFoundResponse()
-    {
-        $response['status_code_header'] = 'HTTP/1.1 404 Not Found';
-        $response['body'] = null;
-        return $response;
-    }
 }
 
 ?>
