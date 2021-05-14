@@ -13,6 +13,9 @@ class WorkoutResource {
     private $workoutId;
     private $workoutService;
 
+    private const HEADER_KEY = 'status_code_header';
+    private const BODY_KEY = 'body';
+
     /*
      * Main constructor
      */
@@ -29,64 +32,69 @@ class WorkoutResource {
     public function processRequest()
     {
         switch ($this->requestMethod) {
-            case 'GET':
-                if ($this->workoutId) {
+            case RequestMethod::GET:
+                if (isset($this->workoutId)) {
                     $response = $this->getWorkout($this->workoutId);
                 } else {
                     $response = $this->getAllWorkouts();
                 };
                 break;
-            // case 'POST':
+            // RequestMethod::POST:
             //     $response = $this->createUserFromRequest();
             //     break;
-            // case 'PUT':
+            // RequestMethod::PUT:
             //     $response = $this->updateUserFromRequest($this->userId);
             //     break;
-            // case 'DELETE':
+            // RequestMethod::DELETE:
             //     $response = $this->deleteUser($this->userId);
             //     break;
             default:
-                $response = $this->notFoundResponse();
+                $response = $this->createResponse(HttpStatusCode::HTTP_METHOD_NOT_ALLOWED, null);
                 break;
         }
 
         // set header and response based on previous functions
-        header($response['status_code_header']);
-        if ($response['body']) {
-            echo $response['body'];
+        header($response[self::HEADER_KEY]);
+        if ($response[self::BODY_KEY]) {
+            echo $response[self::BODY_KEY];
         }
-    }
-
-    private function getAllWorkouts()
-    {
-        $result = $this->workoutService->getWorkouts();
-
-        $response['status_code_header'] = 'HTTP/1.1 200 OK';
-        $response['body'] = json_encode($result);
-
-        return $response;
     }
 
     private function getWorkout($id)
     {
-        $result = $this->workoutService->getWorkout($id);
         $response = null;
 
-        if (!is_null($result)) {
-            $response['status_code_header'] = 'HTTP/1.1 200 OK';
-            $response['body'] = json_encode($result);
+        // id has to be numeric
+        if (!is_numeric($id)) {
+            $response = $this->createResponse(HttpStatusCode::HTTP_BAD_REQUEST, null);
         }
         else {
-            $response = $this->notFoundResponse();
+            $result = $this->workoutService->getWorkout($id);
+
+            if (is_null($result)) {
+                $response = $this->createResponse(HttpStatusCode::HTTP_NOT_FOUND, null);
+            }
+            else {
+                $response = $this->createResponse(HttpStatusCode::HTTP_OK, json_encode($result));
+            }
         }
 
         return $response;
     }
 
-    private function notFoundResponse()
+    private function getAllWorkouts()
     {
-        $response['status_code_header'] = 'HTTP/1.1 404 Not Found';
-        $response['body'] = null;
+        // add validation
+        $result = $this->workoutService->getWorkouts();
+
+        $response = $this->createResponse(HttpStatusCode::HTTP_OK, json_encode($result));
+
+        return $response;
+    }
+
+    private function createResponse($statusCode, $body) {
+        $response[self::HEADER_KEY] = HttpStatusCode::httpHeaderFor($statusCode);
+        $response[self::BODY_KEY] = $body;
 
         return $response;
     }

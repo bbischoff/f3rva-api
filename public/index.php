@@ -25,7 +25,7 @@ switch($uri[1]) {
         // set the workoutId if it exists in the path
         $workoutId = NULL;
         if (isset($uri[2])) {
-            $workoutId = (int) $uri[2];
+            $workoutId = $uri[2];
         }
 
         // delegate to the resource
