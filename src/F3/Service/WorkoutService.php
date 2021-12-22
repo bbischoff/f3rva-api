@@ -205,8 +205,11 @@ class WorkoutService {
 		
 		return $refreshed;
 	}
+	*/
 	
 	public function deleteWorkout($workoutId) {
+		$success = false;
+
 		$db = Database::getInstance()->getDatabase();
 		try {
 			$db->beginTransaction();
@@ -224,16 +227,15 @@ class WorkoutService {
 			$this->workoutRepo->deleteWorkout($workoutId);
 			
 			$db->commit();
+			$success = true;
 		}
 		catch (\Exception $e) {
 			$db->rollBack();
 			error_log($e);
-			throw $e;
 		}
 		
-		return $workoutId;
+		return $success;
 	}
-	*/
 
 	private function processWorkoutResults($workouts) {
 		$workoutsArray = array();

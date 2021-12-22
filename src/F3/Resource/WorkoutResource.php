@@ -2,6 +2,7 @@
 
 namespace F3\Resource;
 
+use Exception;
 use F3\Service\WorkoutService;
 use F3\Util\DateUtil;
 
@@ -49,9 +50,9 @@ class WorkoutResource {
             // RequestMethod::PUT:
             //     $response = $this->updateUserFromRequest($this->userId);
             //     break;
-            // RequestMethod::DELETE:
-            //     $response = $this->deleteUser($this->userId);
-            //     break;
+            case RequestMethod::DELETE:
+                $response = $this->deleteWorkout($this->workoutId);
+                break;
             default:
                 $response = $this->createResponse(HttpStatusCode::HTTP_METHOD_NOT_ALLOWED, null);
                 break;
@@ -96,6 +97,34 @@ class WorkoutResource {
         }
         else {
             $response = $this->createResponse(HttpStatusCode::HTTP_BAD_REQUEST, null);
+        }
+
+        return $response;
+    }
+
+    private function deleteWorkout($id)
+    {
+        $response = null;
+
+        // id has to be numeric
+        if (!is_numeric($id)) {
+            $response = $this->createResponse(HttpStatusCode::HTTP_BAD_REQUEST, null);
+        }
+        else {
+            $result = $this->workoutService->getWorkout($id);
+
+            if (is_null($result)) {
+                $response = $this->createResponse(HttpStatusCode::HTTP_NOT_FOUND, null);
+            }
+            else {
+                $success = $this->workoutService->deleteWorkout($id);
+                if ($success) {
+                    $response = $this->createResponse(HttpStatusCode::HTTP_OK, null);
+                }
+                else {
+                    $response = $this->createResponse(HttpStatusCode::HTTP_INTERNAL_SERVER_ERROR, null);
+                }
+            }
         }
 
         return $response;
@@ -160,18 +189,6 @@ class WorkoutResource {
             return $this->unprocessableEntityResponse();
         }
         $this->personGateway->update($id, $input);
-        $response['status_code_header'] = 'HTTP/1.1 200 OK';
-        $response['body'] = null;
-        return $response;
-    }
-
-    private function deleteUser($id)
-    {
-        $result = $this->personGateway->find($id);
-        if (! $result) {
-            return $this->notFoundResponse();
-        }
-        $this->personGateway->delete($id);
         $response['status_code_header'] = 'HTTP/1.1 200 OK';
         $response['body'] = null;
         return $response;
