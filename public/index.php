@@ -5,7 +5,7 @@
  * If the requested path is not a known path, appropriate and consistent error handling happens here.
  */
 require "../bootstrap.php";
-use Src\F3\Resource\WorkoutResource;
+use F3\Resource\WorkoutResource;
 
 // set default headers
 header("Access-Control-Allow-Origin: *");

@@ -1,5 +1,5 @@
 <?php
-namespace Src\F3\Repo;
+namespace F3\Repo;
 
 /**
  * Member repository encapsulating all database access for a member.

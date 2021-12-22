@@ -1,5 +1,5 @@
 <?php
-namespace Src\F3\Model;
+namespace F3\Model;
 
 class AO implements \JsonSerializable {
 	private $id = null;

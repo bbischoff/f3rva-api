@@ -1,6 +1,6 @@
 <?php
 
-namespace Src\F3\Resource;
+namespace F3\Resource;
 
 class HttpStatusCode
 {

@@ -1,7 +1,7 @@
 <?php
-namespace Src\F3\Repo;
+namespace F3\Repo;
 
-use Src\F3\Settings;
+use F3\Settings;
 use PDO;
 
 /**

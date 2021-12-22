@@ -1,8 +1,9 @@
 <?php
 
-namespace Src\F3\Resource;
+namespace F3\Resource;
 
-use Src\F3\Service\WorkoutService;
+use F3\Service\WorkoutService;
+use F3\Util\DateUtil;
 
 /*
  * The main REST resource controller for all supported ${REQUEST_METHOD}s
@@ -16,7 +17,7 @@ class WorkoutResource {
     private const HEADER_KEY = 'status_code_header';
     private const BODY_KEY = 'body';
 
-    /*
+    /**
      * Main constructor
      */
     public function __construct($requestMethod, $workoutId)
@@ -26,7 +27,7 @@ class WorkoutResource {
         $this->workoutService = new WorkoutService();
     }
 
-    /*
+    /**
      * Handles all supported requests
      */
     public function processRequest()
@@ -36,7 +37,10 @@ class WorkoutResource {
                 if (isset($this->workoutId)) {
                     $response = $this->getWorkout($this->workoutId);
                 } else {
-                    $response = $this->getAllWorkouts();
+                    $startDate = isset($_GET['startDate']) ? $_GET['startDate'] : null;
+                    $numDays = isset($_GET['numberOfDays']) ? $_GET['numberOfDays'] : null;
+                
+                    $response = $this->getAllWorkouts($startDate, $numDays);
                 };
                 break;
             // RequestMethod::POST:
@@ -82,14 +86,47 @@ class WorkoutResource {
         return $response;
     }
 
-    private function getAllWorkouts()
+    private function getAllWorkouts($startDate, $numDays)
     {
-        // add validation
-        $result = $this->workoutService->getWorkouts();
+        $response = null;
 
-        $response = $this->createResponse(HttpStatusCode::HTTP_OK, json_encode($result));
+        if ($this->validWorkoutsRequest($startDate, $numDays)) {
+            $result = $this->workoutService->getWorkouts($startDate, $numDays);
+            $response = $this->createResponse(HttpStatusCode::HTTP_OK, json_encode($result));
+        }
+        else {
+            $response = $this->createResponse(HttpStatusCode::HTTP_BAD_REQUEST, null);
+        }
 
         return $response;
+    }
+
+    private function validWorkoutsRequest($startDate, $numDays) {
+        $valid = false;
+
+        // validation rules
+        if ($this->validStartDate($startDate) &&
+            $this->validNumberOfDays($numDays)) {
+
+            $valid = true;
+        }
+
+        return $valid;
+    }
+
+    private function validStartDate($startDate) {
+        $valid = false;
+
+        // if it's null or a valid date
+        if (is_null($startDate) || DateUtil::validDate($startDate)) {
+            $valid = true;
+        }
+
+        return $valid;
+    }
+
+    private function validNumberOfDays($numDays) {
+        return true;
     }
 
     private function createResponse($statusCode, $body) {

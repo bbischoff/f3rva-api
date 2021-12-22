@@ -1,5 +1,5 @@
 <?php
-namespace Src\F3\Dao;
+namespace F3\Dao;
 
 use DOMDocument;
 use DOMXPath;

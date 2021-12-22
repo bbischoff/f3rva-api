@@ -1,13 +1,13 @@
 <?php
-namespace Src\F3\Service;
+namespace F3\Service;
 
-use Src\F3\Dao\ScraperDao;
-use Src\F3\Model\Member;
-use Src\F3\Model\Workout;
-use Src\F3\Repo\Database;
-use Src\F3\Repo\WorkoutRepository;
-use Src\F3\Service\MemberService;
-use Src\F3\Util\DateUtil;
+use F3\Dao\ScraperDao;
+use F3\Model\Member;
+use F3\Model\Workout;
+use F3\Repo\Database;
+use F3\Repo\WorkoutRepository;
+use F3\Service\MemberService;
+use F3\Util\DateUtil;
 
 /**
  * Service class encapsulating business logic for workouts.
@@ -66,10 +66,15 @@ class WorkoutService {
 	 * 
 	 * @return array of Workout
 	 */
-	public function getWorkouts($endDate, $numberOfDaysBack) {
+	public function getWorkouts($endDate = null, $numberOfDaysBack = null) {
 		error_log('endDate: ' . $endDate);
+
+		// set defaults
 		if (is_null($endDate)) {
 			$endDate = $this->workoutRepo->findMostRecentWorkoutDate();
+		}
+		if (is_null($numberOfDaysBack)) {
+			$numberOfDaysBack = 5;
 		}
 		
 		$startDate = DateUtil::subtractInterval($endDate, 'P' . $numberOfDaysBack . 'D');
@@ -235,7 +240,8 @@ class WorkoutService {
 		
 		foreach ($workouts as $workout) {
 			$workoutId = $workout['WORKOUT_ID'];
-			if (is_null($workoutsArray[$workoutId])) {
+			
+			if (!array_key_exists($workoutId, $workoutsArray)) { //is_null($workoutsArray[strval($workoutId)])) {
 				$workoutObj = $this->createWorkoutObj($workout);
 				$workoutsArray[$workoutObj->getWorkoutId()] = $workoutObj;
 			}

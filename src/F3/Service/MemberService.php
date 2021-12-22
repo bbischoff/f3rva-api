@@ -1,10 +1,10 @@
 <?php
-namespace Src\F3\Service;
+namespace F3\Service;
 
-use Src\F3\Model\Member;
-use Src\F3\Repo\Database;
-use Src\F3\Repo\MemberRepository;
-use Src\F3\Model\MemberStats;
+use F3\Model\Member;
+use F3\Repo\Database;
+use F3\Repo\MemberRepository;
+use F3\Model\MemberStats;
 
 /**
  * Service class encapsulating business logic for members.
