@@ -19,10 +19,10 @@ class WorkoutService {
 	private $scraperDao;
 	private $workoutRepo;
 
-	public function __construct() {
-		$this->memberService = new MemberService();
-		$this->scraperDao = new ScraperDao();
-		$this->workoutRepo = new WorkoutRepository();
+	public function __construct(MemberService $memberService, ScraperDao $scraperDao, WorkoutRepository $workoutRepo) {
+		$this->memberService = $memberService;
+		$this->scraperDao = $scraperDao;
+		$this->workoutRepo = $workoutRepo;
 	}
 
 	/**

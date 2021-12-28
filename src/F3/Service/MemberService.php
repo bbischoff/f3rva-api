@@ -14,8 +14,8 @@ use F3\Model\MemberStats;
 class MemberService {
 	private $memberRepo;
 	
-	public function __construct() {
-		$this->memberRepo = new MemberRepository();
+	public function __construct(MemberRepository $memberRepo) {
+		$this->memberRepo = $memberRepo;
 	}
 	
 	public function getMembers() {

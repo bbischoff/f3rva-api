@@ -1,11 +1,12 @@
 <?php
 
+use F3\Resource\WorkoutResource;
+
 /**
  * This file serves as the front controller for all API requests, essentially a router.
  * If the requested path is not a known path, appropriate and consistent error handling happens here.
  */
-require "../bootstrap.php";
-use F3\Resource\WorkoutResource;
+$container = require "../bootstrap.php";
 
 // set default headers
 header("Access-Control-Allow-Origin: *");
@@ -29,8 +30,15 @@ switch($uri[1]) {
         }
 
         // delegate to the resource
-        $resource = new WorkoutResource($requestMethod, $workoutId);
-        $resource->processRequest();
+        $resource = $container->get(WorkoutResource::class);
+        $response = $resource->processRequest($requestMethod, $workoutId);
+
+        // set header and response body
+        header($response[WorkoutResource::HEADER_KEY]);
+        if ($response[WorkoutResource::BODY_KEY]) {
+            echo $response[WorkoutResource::BODY_KEY];
+        }
+        
         break;
     default:
         notFound();
