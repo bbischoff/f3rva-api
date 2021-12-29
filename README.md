@@ -3,10 +3,10 @@
 ## Installation
 Add the following to php.ini
 
-[xdebug]
-xdebug.mode = debug,coverage
-xdebug.start_with_request = yes
-xdebug.client_port = 9000
+    [xdebug]
+    xdebug.mode = debug,coverage
+    xdebug.start_with_request = yes
+    xdebug.client_port = 9000
 
 ## Commands
 
