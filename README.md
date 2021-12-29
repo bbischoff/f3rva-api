@@ -11,7 +11,7 @@ Add the following to php.ini
 ## Commands
 
 ### Web Server
-php -S localhost:8000 -t public
+    php -S localhost:8000 -t public
 
 ### Code Coverage
-./vendor/bin/phpunit --coverage-html html --coverage-filter src test
+    ./vendor/bin/phpunit --coverage-html html --coverage-filter src test
