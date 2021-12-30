@@ -43,12 +43,12 @@ class MemberService {
 	
 	public function getMemberById($memberId) {
 		$memberResult = $this->memberRepo->find($memberId);
-		$aliases = $this->memberRepo->findAliases($memberId);
 		$member = null;
 		
 		if ($memberResult) {
 			$member = $this->createMember($memberResult['MEMBER_ID'], $memberResult['F3_NAME']);
 			
+			$aliases = $this->memberRepo->findAliases($memberId);
 			$aliasArray = array();
 			if ($aliases) {
 				foreach($aliases as $alias) {
