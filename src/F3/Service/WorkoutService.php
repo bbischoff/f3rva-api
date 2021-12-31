@@ -18,11 +18,13 @@ class WorkoutService {
 	private $memberService;
 	private $scraperDao;
 	private $workoutRepo;
+	private $database;
 
-	public function __construct(MemberService $memberService, ScraperDao $scraperDao, WorkoutRepository $workoutRepo) {
+	public function __construct(MemberService $memberService, ScraperDao $scraperDao, WorkoutRepository $workoutRepo, Database $database) {
 		$this->memberService = $memberService;
 		$this->scraperDao = $scraperDao;
 		$this->workoutRepo = $workoutRepo;
+		$this->database = $database;
 	}
 
 	/**
@@ -39,7 +41,7 @@ class WorkoutService {
 			$workoutId = $workout['WORKOUT_ID'];
 			if (is_null($workoutObj)) {
 				$workoutObj = $this->createWorkoutObj($workout);
-				
+
 				// retrieve pax
 				$paxList = $this->workoutRepo->findPax($workoutId);
 				$paxArray = array();
@@ -209,8 +211,8 @@ class WorkoutService {
 	
 	public function deleteWorkout($workoutId) {
 		$success = false;
+		$db = $this->database->getDatabase();
 
-		$db = Database::getInstance()->getDatabase();
 		try {
 			$db->beginTransaction();
 			

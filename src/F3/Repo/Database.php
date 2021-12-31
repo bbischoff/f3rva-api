@@ -5,8 +5,6 @@ use F3\Settings;
 use PDO;
 
 /**
- * Singleton class used as a container for database connectivity
- * 
  * @author bbischoff
  */
 class Database 
@@ -14,7 +12,7 @@ class Database
     private $_db;
     private static $_instance;
 
-    private function __construct() {
+    public function __construct() {
         $host = Settings::DB_HOST;
         $db   = Settings::DB_NAME;
         $user = Settings::DB_USER;
@@ -33,6 +31,9 @@ class Database
 
     private function __clone(){}
 
+    /**
+     * @deprecated  Singleton functionality will be removed in the future, use DI instead
+     */
     public static function getInstance() {
         if (!(self::$_instance instanceof self)) {
             self::$_instance = new self();
