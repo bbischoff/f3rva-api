@@ -13,9 +13,11 @@ use F3\Model\MemberStats;
  */
 class MemberService {
 	private $memberRepo;
+	private $database;
 	
-	public function __construct(MemberRepository $memberRepo) {
+	public function __construct(MemberRepository $memberRepo, Database $database) {
 		$this->memberRepo = $memberRepo;
+		$this->database = $database;
 	}
 	
 	public function getMembers() {
@@ -85,7 +87,8 @@ class MemberService {
 	}
 	
 	public function assignAlias($memberId, $associatedMemberId) {
-		$db = Database::getInstance()->getDatabase();
+		$db = $this->database->getDatabase();
+		
 		try {
 			$db->beginTransaction();
 			

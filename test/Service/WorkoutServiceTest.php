@@ -5,7 +5,6 @@ use F3\Repo\Database;
 use F3\Repo\WorkoutRepository;
 use F3\Service\MemberService;
 use F3\Service\WorkoutService;
-use PDO;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -14,20 +13,45 @@ use PHPUnit\Framework\TestCase;
  */
 class WorkoutServiceTest extends TestCase {
 
-    public function testGetWorkout() {
-        $workoutRepoMock = $this->getMockBuilder(WorkoutRepository::class)
+    /** @var \PHPUnit\Framework\MockObject\MockObject $workoutRepoMock */
+    private $workoutRepoMock;
+    /** @var \PHPUnit\Framework\MockObject\MockObject $memberServiceMock */
+    private $memberServiceMock;
+    /** @var \PHPUnit\Framework\MockObject\MockObject $scraperDaoMock */
+    private $scraperDaoMock;
+    /** @var \PHPUnit\Framework\MockObject\MockObject $databaseMock */
+    private $databaseMock;
+    /** @var \F3\Repo\WorkoutRepository $workoutRepo */
+    private $workoutRepo;
+    /** @var \F3\Service\MemberService $memberService */
+    private $memberService;
+    /** @var \F3\Dao\ScraperDao $scraperDao */
+    private $scraperDao;
+    /** @var \F3\Repo\Database $database */
+    private $database;
+    
+    protected function setUp(): void
+    {
+        $this->workoutRepoMock = $this->getMockBuilder(WorkoutRepository::class)
                                 ->disableOriginalConstructor()
                                 ->getMock();
-        $memberServiceMock = $this->getMockBuilder(MemberService::class)
+        $this->memberServiceMock = $this->getMockBuilder(MemberService::class)
                                 ->disableOriginalConstructor()
                                 ->getMock();
-        $scraperDaoMock = $this->getMockBuilder(ScraperDao::class)
+        $this->scraperDaoMock = $this->getMockBuilder(ScraperDao::class)
                                 ->disableOriginalConstructor()
                                 ->getMock();
-        $databaseMock = $this->getMockBuilder(Database::class)
+        $this->databaseMock = $this->getMockBuilder(Database::class)
                              ->disableOriginalConstructor()
                              ->getMock();
-   
+        
+        $this->workoutRepo = $this->workoutRepoMock;
+        $this->memberService = $this->memberServiceMock;
+        $this->scraperDao = $this->scraperDaoMock;
+        $this->database = $this->databaseMock;
+    }
+
+    public function testGetWorkout() {   
         // create mocked response
         $workout = array();
         $workout['WORKOUT_ID'] = '1';
@@ -51,27 +75,18 @@ class WorkoutServiceTest extends TestCase {
         $workout2['Q'] = 'Lockjaw';
         array_push($workoutArray, $workout2);
 
-        $workoutRepoMock->method('find')
-                        ->willReturn($workoutArray);
+        $this->workoutRepoMock->method('find')
+                              ->willReturn($workoutArray);
 
         $pax = array();
         $pax['MEMBER_ID'] = '4';
         $pax['F3_NAME'] = 'Upchuck';
         $paxArray = array();
         array_push($paxArray, $pax);
-        $workoutRepoMock->method('findPax')
-                        ->willReturn($paxArray);
+        $this->workoutRepoMock->method('findPax')
+                              ->willReturn($paxArray);
 
-        /** @var \F3\Repo\WorkoutRepository $workoutRepo */
-        $workoutRepo = $workoutRepoMock;
-        /** @var \F3\Service\MemberService $memberService */
-        $memberService = $memberServiceMock;
-        /** @var \F3\Dao\ScraperDao $scraperDao */
-        $scraperDao = $scraperDaoMock;
-        /** @var \F3\Repo\Database $database */
-        $database = $databaseMock;
-
-        $workoutService = new WorkoutService($memberService, $scraperDao, $workoutRepo, $database);
+        $workoutService = new WorkoutService($this->memberService, $this->scraperDao, $this->workoutRepo, $this->database);
         $result = $workoutService->getWorkout(1);
 
         $this->assertEquals('1', $result->getWorkoutId(), 'workout id mismatch');
@@ -88,19 +103,6 @@ class WorkoutServiceTest extends TestCase {
     }
 
     public function testGetWorkouts() {
-        $workoutRepoMock = $this->getMockBuilder(WorkoutRepository::class)
-                                ->disableOriginalConstructor()
-                                ->getMock();
-        $memberServiceMock = $this->getMockBuilder(MemberService::class)
-                                ->disableOriginalConstructor()
-                                ->getMock();
-        $scraperDaoMock = $this->getMockBuilder(ScraperDao::class)
-                               ->disableOriginalConstructor()
-                               ->getMock();
-        $databaseMock = $this->getMockBuilder(Database::class)
-                             ->disableOriginalConstructor()
-                             ->getMock();
-
         // create mocked response
         $workout = array();
         $workout['WORKOUT_ID'] = '1';
@@ -124,21 +126,12 @@ class WorkoutServiceTest extends TestCase {
         $workout2['Q'] = 'Lockjaw';
         array_push($workoutArray, $workout2);
 
-        $workoutRepoMock->method('findAllByDateRange')
+        $this->workoutRepoMock->method('findAllByDateRange')
                         ->willReturn($workoutArray);
-        $workoutRepoMock->method('findMostRecentWorkoutDate')
+        $this->workoutRepoMock->method('findMostRecentWorkoutDate')
                         ->willReturn('2021-12-30');
 
-        /** @var \F3\Repo\WorkoutRepository $workoutRepo */
-        $workoutRepo = $workoutRepoMock;
-        /** @var \F3\Service\MemberService $memberService */
-        $memberService = $memberServiceMock;
-        /** @var \F3\Dao\ScraperDao $scraperDao */
-        $scraperDao = $scraperDaoMock;
-        /** @var \F3\Repo\Database $database */
-        $database = $databaseMock;
-
-        $workoutService = new WorkoutService($memberService, $scraperDao, $workoutRepo, $database);
+        $workoutService = new WorkoutService($this->memberService, $this->scraperDao, $this->workoutRepo, $this->database);
         $result = $workoutService->getWorkouts();
 
         $this->assertEquals('1', $result['1']->getWorkoutId(), 'workout id mismatch');
@@ -153,35 +146,14 @@ class WorkoutServiceTest extends TestCase {
     }
 
     public function testDeleteWorkout() {
-        $workoutRepoMock = $this->getMockBuilder(WorkoutRepository::class)
-                                ->disableOriginalConstructor()
-                                ->getMock();
-        $memberServiceMock = $this->getMockBuilder(MemberService::class)
-                                ->disableOriginalConstructor()
-                                ->getMock();
-        $scraperDaoMock = $this->getMockBuilder(ScraperDao::class)
-                               ->disableOriginalConstructor()
-                               ->getMock();
-        $databaseMock = $this->getMockBuilder(Database::class)
-                               ->disableOriginalConstructor()
-                               ->getMock();
         $pdoMock = $this->getMockBuilder(PDO::class)
-                               ->disableOriginalConstructor()
-                               ->getMock();
+                        ->disableOriginalConstructor()
+                        ->getMock();
     
-        /** @var \F3\Repo\WorkoutRepository $workoutRepo */
-        $workoutRepo = $workoutRepoMock;
-        /** @var \F3\Service\MemberService $memberService */
-        $memberService = $memberServiceMock;
-        /** @var \F3\Dao\ScraperDao $scraperDao */
-        $scraperDao = $scraperDaoMock;
-        /** @var \F3\Repo\Database $database */
-        $database = $databaseMock;
+        $this->databaseMock->method('getDatabase')
+                           ->willReturn($pdoMock);
 
-        $databaseMock->method('getDatabase')
-                     ->willReturn($pdoMock);
-
-        $workoutService = new WorkoutService($memberService, $scraperDao, $workoutRepo, $database);
+        $workoutService = new WorkoutService($this->memberService, $this->scraperDao, $this->workoutRepo, $this->database);
         $result = $workoutService->deleteWorkout(1);
 
         $this->assertTrue($result, 'delete expected to be true');
@@ -189,37 +161,16 @@ class WorkoutServiceTest extends TestCase {
 
 
     public function testDeleteWorkoutFalure() {
-        $workoutRepoMock = $this->getMockBuilder(WorkoutRepository::class)
-                                ->disableOriginalConstructor()
-                                ->getMock();
-        $memberServiceMock = $this->getMockBuilder(MemberService::class)
-                                ->disableOriginalConstructor()
-                                ->getMock();
-        $scraperDaoMock = $this->getMockBuilder(ScraperDao::class)
-                               ->disableOriginalConstructor()
-                               ->getMock();
-        $databaseMock = $this->getMockBuilder(Database::class)
-                               ->disableOriginalConstructor()
-                               ->getMock();
         $pdoMock = $this->getMockBuilder(PDO::class)
-                               ->disableOriginalConstructor()
-                               ->getMock();
-    
-        /** @var \F3\Repo\WorkoutRepository $workoutRepo */
-        $workoutRepo = $workoutRepoMock;
-        /** @var \F3\Service\MemberService $memberService */
-        $memberService = $memberServiceMock;
-        /** @var \F3\Dao\ScraperDao $scraperDao */
-        $scraperDao = $scraperDaoMock;
-        /** @var \F3\Repo\Database $database */
-        $database = $databaseMock;
+                        ->disableOriginalConstructor()
+                        ->getMock();    
 
-        $databaseMock->method('getDatabase')
+        $this->databaseMock->method('getDatabase')
                      ->willReturn($pdoMock);
         $pdoMock->method('beginTransaction')
                 ->willThrowException(new Exception());
 
-        $workoutService = new WorkoutService($memberService, $scraperDao, $workoutRepo, $database);
+        $workoutService = new WorkoutService($this->memberService, $this->scraperDao, $this->workoutRepo, $this->database);
         $result = $workoutService->deleteWorkout(1);
 
         $this->assertFalse($result, 'delete expected to be false');

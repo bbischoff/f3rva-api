@@ -1,6 +1,7 @@
 <?php
 
 use F3\Model\Member;
+use F3\Repo\Database;
 use F3\Repo\MemberRepository;
 use F3\Service\MemberService;
 use PHPUnit\Framework\TestCase;
@@ -11,11 +12,29 @@ use PHPUnit\Framework\TestCase;
  */
 class MemberServiceTest extends TestCase {
 
-    public function testGetMembers() {
-        $mock = $this->getMockBuilder(MemberRepository::class)
-                     ->disableOriginalConstructor()
-                     ->getMock();
+    /** @var \PHPUnit\Framework\MockObject\MockObject $memberRepoMock */
+    private $memberRepoMock;
+    /** @var \PHPUnit\Framework\MockObject\MockObject $databaseMock */
+    private $databaseMock;
+    /** @var \F3\Repo\MemberRepository $memberRepo */
+    private $memberRepo;
+    /** @var \F3\Repo\Database $database */
+    private $database;
+    
+    protected function setUp(): void
+    {
+        $this->memberRepoMock = $this->getMockBuilder(MemberRepository::class)
+                                     ->disableOriginalConstructor()
+                                     ->getMock();
+        $this->databaseMock = $this->getMockBuilder(Database::class)
+                                   ->disableOriginalConstructor()
+                                   ->getMock();
         
+        $this->memberRepo = $this->memberRepoMock;
+        $this->database = $this->databaseMock;
+    }
+    
+    public function testGetMembers() {
         // create mocked response
         $member = array();
         $member["MEMBER_ID"] = '1';
@@ -23,12 +42,10 @@ class MemberServiceTest extends TestCase {
         $memberArray = array();
         $memberArray['1'] = $member;
 
-        $mock->method('findAll')
-             ->willReturn($memberArray);
+        $this->memberRepoMock->method('findAll')
+                             ->willReturn($memberArray);
 
-        /** @var \F3\Repo\MemberRepository $memberRepo */
-        $memberRepo = $mock;
-        $memberService = new MemberService($memberRepo);
+        $memberService = new MemberService($this->memberRepo, $this->database);
         $result = $memberService->getMembers();
 
         $this->assertEquals('1', $result["1"]->getMemberId(), 'member id mismatch');
@@ -36,21 +53,15 @@ class MemberServiceTest extends TestCase {
     }
 
     public function testGetMemberByName() {
-        $mock = $this->getMockBuilder(MemberRepository::class)
-                     ->disableOriginalConstructor()
-                     ->getMock();
-        
         // create mocked response
         $member = array();
         $member["MEMBER_ID"] = '1';
         $member["F3_NAME"] = 'Splinter';
 
-        $mock->method('findByF3NameOrAlias')
-             ->willReturn($member);
+        $this->memberRepoMock->method('findByF3NameOrAlias')
+                             ->willReturn($member);
 
-        /** @var \F3\Repo\MemberRepository $memberRepo */
-        $memberRepo = $mock;
-        $memberService = new MemberService($memberRepo);
+        $memberService = new MemberService($this->memberRepo, $this->database);
         $result = $memberService->getMember('Splinter');
 
         $this->assertEquals('1', $result->getMemberId(), 'member id mismatch');
@@ -58,29 +69,23 @@ class MemberServiceTest extends TestCase {
     }
 
     public function testGetMemberById() {
-        $mock = $this->getMockBuilder(MemberRepository::class)
-                     ->disableOriginalConstructor()
-                     ->getMock();
-        
         // create mocked response
         $member = array();
         $member["MEMBER_ID"] = '1';
         $member["F3_NAME"] = 'Splinter';
 
-        $mock->method('find')
-             ->willReturn($member);
+        $this->memberRepoMock->method('find')
+                             ->willReturn($member);
         
         $alias = array();
         $alias["F3_ALIAS"] = 'Splint';
         $aliasArray = array();
         array_push($aliasArray, $alias);
 
-        $mock->method('findAliases')
-             ->willReturn($aliasArray);
+        $this->memberRepoMock->method('findAliases')
+                             ->willReturn($aliasArray);
 
-        /** @var \F3\Repo\MemberRepository $memberRepo */
-        $memberRepo = $mock;
-        $memberService = new MemberService($memberRepo);
+        $memberService = new MemberService($this->memberRepo, $this->database);
         $result = $memberService->getMemberById(1);
 
         $this->assertEquals('1', $result->getMemberId(), 'member id mismatch');
@@ -89,21 +94,15 @@ class MemberServiceTest extends TestCase {
     }
 
     public function testGetOrAddMemberFound() {
-        $mock = $this->getMockBuilder(MemberRepository::class)
-                     ->disableOriginalConstructor()
-                     ->getMock();
-        
         // create mocked response
         $member = array();
         $member["MEMBER_ID"] = '1';
         $member["F3_NAME"] = 'Splinter';
 
-        $mock->method('findByF3NameOrAlias')
+        $this->memberRepoMock->method('findByF3NameOrAlias')
              ->willReturn($member);
 
-        /** @var \F3\Repo\MemberRepository $memberRepo */
-        $memberRepo = $mock;
-        $memberService = new MemberService($memberRepo);
+        $memberService = new MemberService($this->memberRepo, $this->database);
         $result = $memberService->getOrAddMember('Splinter');
 
         $this->assertEquals('1', $result->getMemberId(), 'member id mismatch');
@@ -111,18 +110,12 @@ class MemberServiceTest extends TestCase {
     }
 
     public function testGetOrAddMemberNotFound() {
-        $mock = $this->getMockBuilder(MemberRepository::class)
-                     ->disableOriginalConstructor()
-                     ->getMock();
-        
-        $mock->method('findByF3NameOrAlias')
-             ->willReturn(null);
-        $mock->method('save')
-             ->willReturn('2');
+        $this->memberRepoMock->method('findByF3NameOrAlias')
+                             ->willReturn(null);
+        $this->memberRepoMock->method('save')
+                             ->willReturn('2');
 
-        /** @var \F3\Repo\MemberRepository $memberRepo */
-        $memberRepo = $mock;
-        $memberService = new MemberService($memberRepo);
+        $memberService = new MemberService($this->memberRepo, $this->database);
         $result = $memberService->getOrAddMember('THE Yankee Aggressor');
 
         $this->assertEquals('2', $result->getMemberId(), 'member id mismatch');
@@ -130,22 +123,16 @@ class MemberServiceTest extends TestCase {
     }
 
     public function testGetMemberStats() {
-        $mock = $this->getMockBuilder(MemberRepository::class)
-                     ->disableOriginalConstructor()
-                     ->getMock();
-        
         // create mocked response
         $memberStats = array();
         $memberStats["NUM_WORKOUTS"] = '52';
         $memberStats["NUM_QS"] = '24';
         $memberStats["Q_RATIO"] = '46.2%';
 
-        $mock->method('findMemberStats')
-             ->willReturn($memberStats);
+        $this->memberRepoMock->method('findMemberStats')
+                             ->willReturn($memberStats);
 
-        /** @var \F3\Repo\MemberRepository $memberRepo */
-        $memberRepo = $mock;
-        $memberService = new MemberService($memberRepo);
+        $memberService = new MemberService($this->memberRepo, $this->database);
         $result = $memberService->getMemberStats(1);
 
         $this->assertEquals('1', $result->getMemberId(), 'member id mismatch');
@@ -155,8 +142,93 @@ class MemberServiceTest extends TestCase {
     }
 
     public function testAssignAlias() {
-        // TODO:  need to refactor code to remove singleton dependency
-        $this->assertTrue(true);
+        $pdoMock = $this->getMockBuilder(PDO::class)
+                        ->disableOriginalConstructor()
+                        ->getMock();
+    
+        $this->databaseMock->method('getDatabase')
+                           ->willReturn($pdoMock);
+
+        $pdoMock->expects($this->once())
+                ->method('beginTransaction');
+        $this->memberRepoMock->method('findExistingAlias')
+                             ->willReturn(false);
+        $this->memberRepoMock->method('findDuplicateWorkoutMembers')
+                             ->willReturn(array());
+        $this->memberRepoMock->expects($this->once())
+                             ->method('createAlias');
+        $this->memberRepoMock->expects($this->once())
+                             ->method('relinkWorkoutPax');
+        $this->memberRepoMock->expects($this->once())
+                             ->method('relinkWorkoutQ');
+        $this->memberRepoMock->expects($this->once())
+                             ->method('relinkMemberAlias');
+        $this->memberRepoMock->expects($this->once())
+                             ->method('delete');
+
+        $memberService = new MemberService($this->memberRepo, $this->database);
+        $result = $memberService->assignAlias(1, 2);
+    }
+
+    public function testAssignAliasAlreadyExisting() {
+        $pdoMock = $this->getMockBuilder(PDO::class)
+                        ->disableOriginalConstructor()
+                        ->getMock();
+    
+        $this->databaseMock->method('getDatabase')
+                           ->willReturn($pdoMock);
+
+        $this->memberRepoMock->method('findExistingAlias')
+                             ->willReturn(true);
+        $this->memberRepoMock->method('findDuplicateWorkoutMembers')
+                             ->willReturn(array());
+        $this->memberRepoMock->expects($this->never())
+                             ->method('createAlias');
+
+        $memberService = new MemberService($this->memberRepo, $this->database);
+        $result = $memberService->assignAlias(1, 2);
+    }
+
+    public function testAssignAliasRemoveDuplicates() {
+        $pdoMock = $this->getMockBuilder(PDO::class)
+                        ->disableOriginalConstructor()
+                        ->getMock();
+    
+        $this->databaseMock->method('getDatabase')
+                           ->willReturn($pdoMock);
+
+        $this->memberRepoMock->method('findExistingAlias')
+                             ->willReturn(true);
+        
+        $dupes = array();
+        $dupeEntry = array();
+        $dupeEntry['WORKOUT_ID'] = '1';
+        array_push($dupes, $dupeEntry);
+
+        $this->memberRepoMock->method('findDuplicateWorkoutMembers')
+                             ->willReturn($dupes);
+        $this->memberRepoMock->expects($this->once())
+                             ->method('removeMemberFromWorkout');
+
+        $memberService = new MemberService($this->memberRepo, $this->database);
+        $result = $memberService->assignAlias(1, 2);
+    }
+
+    public function testAssignAliasFailure() {
+        $pdoMock = $this->getMockBuilder(PDO::class)
+                        ->disableOriginalConstructor()
+                        ->getMock();
+    
+        $this->databaseMock->method('getDatabase')
+                           ->willReturn($pdoMock);
+        $pdoMock->method('beginTransaction')
+                ->willThrowException(new Exception());
+
+        $pdoMock->expects($this->once())
+                ->method('rollBack');
+
+        $memberService = new MemberService($this->memberRepo, $this->database);
+        $result = $memberService->assignAlias(1, 2);
     }
 }
 ?>
