@@ -27,5 +27,20 @@ class DateUtilTest extends TestCase {
         $this->assertFalse(DateUtil::validDate('2021-13-31'), 'invalid months');
         $this->assertFalse(DateUtil::validDate('2021-5-6'), 'no leading zeros');
     }
+
+    public function testGetDefaultDateDefaultInterval() {
+        $day1 = new \DateTime();
+        $day2 = $day1->sub(new \DateInterval('P0M'));
+        $this->assertEquals($day2->format('Y-m-d'), DateUtil::getDefaultDate(null), 'same day');
+
+    }
+
+    public function testGetDefaultDateSubtractInterval() {
+        // test subtracting a day
+        $today = new \DateTime();
+        $yesterday = $today->sub(new \DateInterval('P1D'));
+        $this->assertEquals($yesterday->format('Y-m-d'), DateUtil::getDefaultDateSubtractInterval(null, 'P1D'), 'yesterday');
+        $this->assertEquals('2021-12-31', DateUtil::getDefaultDateSubtractInterval('2021-12-31', 'P0M'), 'same date');
+    }
 }
 ?>
