@@ -1,9 +1,10 @@
 <?php
+namespace F3\Service;
 
 use F3\Model\Member;
 use F3\Repo\Database;
 use F3\Repo\MemberRepository;
-use F3\Service\MemberService;
+use PDO;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -222,7 +223,7 @@ class MemberServiceTest extends TestCase {
         $this->databaseMock->method('getDatabase')
                            ->willReturn($pdoMock);
         $pdoMock->method('beginTransaction')
-                ->willThrowException(new Exception());
+                ->willThrowException(new \Exception());
 
         $pdoMock->expects($this->once())
                 ->method('rollBack');

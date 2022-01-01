@@ -1,7 +1,7 @@
 <?php
+namespace F3\Util;
 
 use PHPUnit\Framework\TestCase;
-use F3\Util\DateUtil;
 
 /**
  * @covers \F3\Util\DateUtil

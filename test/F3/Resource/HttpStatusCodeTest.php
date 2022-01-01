@@ -1,7 +1,7 @@
 <?php
+namespace F3\Resource;
 
 use PHPUnit\Framework\TestCase;
-use F3\Resource\HttpStatusCode;
 
 /**
  * @covers \F3\Resource\HttpStatusCode

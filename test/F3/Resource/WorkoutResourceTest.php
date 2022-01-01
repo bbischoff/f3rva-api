@@ -1,10 +1,8 @@
 <?php
+namespace F3\Resource;
 
 use PHPUnit\Framework\TestCase;
 use F3\Model\Workout;
-use F3\Resource\HttpStatusCode;
-use F3\Resource\RequestMethod;
-use F3\Resource\WorkoutResource;
 use F3\Service\WorkoutService;
 
 /**

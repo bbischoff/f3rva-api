@@ -1,10 +1,10 @@
 <?php
+namespace F3\Service;
 
 use F3\Dao\ScraperDao;
 use F3\Repo\Database;
 use F3\Repo\WorkoutRepository;
-use F3\Service\MemberService;
-use F3\Service\WorkoutService;
+use PDO;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -168,7 +168,7 @@ class WorkoutServiceTest extends TestCase {
         $this->databaseMock->method('getDatabase')
                      ->willReturn($pdoMock);
         $pdoMock->method('beginTransaction')
-                ->willThrowException(new Exception());
+                ->willThrowException(new \Exception());
 
         $workoutService = new WorkoutService($this->memberService, $this->scraperDao, $this->workoutRepo, $this->database);
         $result = $workoutService->deleteWorkout(1);
