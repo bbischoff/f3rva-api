@@ -10,10 +10,10 @@ use DateTimeZone;
  * @author bbischoff
  */
 class WorkoutRepository {
-	protected $db;
+	private $db;
 
-	public function __construct() {
-		$this->db = Database::getInstance()->getDatabase();
+	public function __construct(Database $database) {
+		$this->db = $database->getDatabase();
 	}
 	
 	public function deleteWorkoutAos($workoutId) {

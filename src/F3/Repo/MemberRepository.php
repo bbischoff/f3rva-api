@@ -9,8 +9,8 @@ namespace F3\Repo;
 class MemberRepository {
 	protected $db;
 
-	public function __construct() {
-		$this->db = Database::getInstance()->getDatabase();
+	public function __construct(Database $database) {
+		$this->db = $database->getDatabase();
 	}
 
 	public function findAll() {
@@ -106,8 +106,7 @@ class MemberRepository {
 					join MEMBER m on wq.MEMBER_ID = m.MEMBER_ID
 					join WORKOUT w on wq.WORKOUT_ID = w.WORKOUT_ID
 		';
-					
-		$hasDates = !empty($startDate) && !empty($endDate);
+
 		if ($hasDates) {
 			$sql = $sql . '
 					where w.WORKOUT_DATE between ? and ?

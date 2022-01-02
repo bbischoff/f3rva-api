@@ -4,7 +4,6 @@ namespace F3\Service;
 use F3\Model\Member;
 use F3\Repo\Database;
 use F3\Repo\MemberRepository;
-use PDO;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -143,7 +142,7 @@ class MemberServiceTest extends TestCase {
     }
 
     public function testAssignAlias() {
-        $pdoMock = $this->getMockBuilder(PDO::class)
+        $pdoMock = $this->getMockBuilder(\PDO::class)
                         ->disableOriginalConstructor()
                         ->getMock();
     
@@ -172,7 +171,7 @@ class MemberServiceTest extends TestCase {
     }
 
     public function testAssignAliasAlreadyExisting() {
-        $pdoMock = $this->getMockBuilder(PDO::class)
+        $pdoMock = $this->getMockBuilder(\PDO::class)
                         ->disableOriginalConstructor()
                         ->getMock();
     
@@ -191,7 +190,7 @@ class MemberServiceTest extends TestCase {
     }
 
     public function testAssignAliasRemoveDuplicates() {
-        $pdoMock = $this->getMockBuilder(PDO::class)
+        $pdoMock = $this->getMockBuilder(\PDO::class)
                         ->disableOriginalConstructor()
                         ->getMock();
     
@@ -216,7 +215,7 @@ class MemberServiceTest extends TestCase {
     }
 
     public function testAssignAliasFailure() {
-        $pdoMock = $this->getMockBuilder(PDO::class)
+        $pdoMock = $this->getMockBuilder(\PDO::class)
                         ->disableOriginalConstructor()
                         ->getMock();
     

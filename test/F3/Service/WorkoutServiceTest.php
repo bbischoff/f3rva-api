@@ -4,7 +4,6 @@ namespace F3\Service;
 use F3\Dao\ScraperDao;
 use F3\Repo\Database;
 use F3\Repo\WorkoutRepository;
-use PDO;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -146,7 +145,7 @@ class WorkoutServiceTest extends TestCase {
     }
 
     public function testDeleteWorkout() {
-        $pdoMock = $this->getMockBuilder(PDO::class)
+        $pdoMock = $this->getMockBuilder(\PDO::class)
                         ->disableOriginalConstructor()
                         ->getMock();
     
@@ -161,7 +160,7 @@ class WorkoutServiceTest extends TestCase {
 
 
     public function testDeleteWorkoutFalure() {
-        $pdoMock = $this->getMockBuilder(PDO::class)
+        $pdoMock = $this->getMockBuilder(\PDO::class)
                         ->disableOriginalConstructor()
                         ->getMock();    
 
