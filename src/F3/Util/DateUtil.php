@@ -20,7 +20,7 @@ class DateUtil {
 		$dateStr = $date;
 		
 		if (empty($dateStr)) {
-			$newDate = new \DateTime(null, new \DateTimeZone(self::TIMEZONE));
+			$newDate = new \DateTime('now', new \DateTimeZone(self::TIMEZONE));
 			$newDate->sub(new \DateInterval($dateInterval));
 			$dateStr = $newDate->format(self::DATE_FORMAT);
 		}
