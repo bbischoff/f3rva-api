@@ -3,6 +3,7 @@ namespace F3\Dao;
 
 use DOMDocument;
 use DOMXPath;
+use F3\Util\HttpRequest;
 
 /**
  * DAO class for screen scraping a website.
@@ -10,26 +11,36 @@ use DOMXPath;
  * @author bbischoff
  */
 class ScraperDao {
-	
-	public function __construct() {
+	private $httpRequest;
+
+	public function __construct(HttpRequest $httpRequest) {
+		$this->httpRequest = $httpRequest;
 	}
 
 	public function parsePost($url) {
 		// call to get the contents of the post
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_HEADER, false);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
-		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
-		$html = curl_exec($ch);
-		curl_close($ch);
+		$this->httpRequest->init($url);
+		$this->httpRequest->setOption(CURLOPT_HEADER, false);
+		$this->httpRequest->setOption(CURLOPT_RETURNTRANSFER, true);
+		$this->httpRequest->setOption(CURLOPT_BINARYTRANSFER, true);
+		$this->httpRequest->setOption(CURLOPT_CONNECTTIMEOUT, 5);
+
+		$html = $this->httpRequest->execute();
+		$this->httpRequest->close();
 		
 		// parse the html contents to a DOM object
 		$doc = new DOMDocument();
 		libxml_use_internal_errors(true);
 		$doc->loadHTML($html);
 		$xpath = new DOMXPath($doc);
+		
+		// query to get the title
+		$titleNode = $xpath->query("//article/header//h1[contains(@class, 'post-title')]")->item(0);
+		$title = trim($titleNode->nodeValue);
+
+		// query to get the author
+		$authorNode = $xpath->query("//article/header//span[contains(@class, 'reviewer')]/a")->item(0);
+		$author = trim($authorNode->textContent);
 		
 		// query to get the workout date
 		$dateNode = $xpath->query("//ul/li/strong[text()='When:']")->item(0);
@@ -58,7 +69,14 @@ class ScraperDao {
 		}
 		
 		// create an object to return;
-		return (object) array('q' => $qArray, 'pax' => $paxArray, 'tags' => $tagsArray, 'date' => $date);
+		return (object) array(
+			'author' => $author,
+			'date' => $date,
+			'pax' => $paxArray, 
+			'q' => $qArray, 
+			'tags' => $tagsArray, 
+			'title' => $title
+		);
 	}
 }
 ?>

@@ -1,6 +1,7 @@
 <?php
 
 use F3\Resource\WorkoutResource;
+use F3\Resource\WorkoutSourceResource;
 
 /**
  * This file serves as the front controller for all API requests, essentially a router.
@@ -40,19 +41,21 @@ switch($uri[1]) {
         }
         
         break;
+    case 'workoutSource': 
+        // delegate to the resource
+        $resource = $container->get(WorkoutSourceResource::class);
+        $response = $resource->processRequest($requestMethod);
+
+        // set header and response body
+        header($response[WorkoutResource::HEADER_KEY]);
+        if ($response[WorkoutResource::BODY_KEY]) {
+            echo $response[WorkoutResource::BODY_KEY];
+        }
+
+        break;
     default:
-        notFound();
+        header('HTTP/1.1 404 Not Found');
         break;
 }
-
-function notFound() {
-    header('HTTP/1.1 404 Not Found');
-}
-
-// the user id is, of course, optional and must be a number:
-// $userId = null;
-// if (isset($uri[2])) {
-//     $userId = (int) $uri[2];
-// }
 
 ?>

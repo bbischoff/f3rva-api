@@ -147,13 +147,6 @@ class WorkoutResource extends AbstractResource {
     private function validNumberOfDays($numDays) {
         return true;
     }
-
-    private function createResponse($statusCode, $body) {
-        $response[self::HEADER_KEY] = HttpStatusCode::httpHeaderFor($statusCode);
-        $response[self::BODY_KEY] = $body;
-
-        return $response;
-    }
 }
 
 ?>

@@ -104,7 +104,19 @@ class WorkoutService {
 		
 		return $this->processWorkoutResults($workouts);
 	}
+	*/
 
+	/**
+	 * Parses a backblast from the source and returns the details on
+	 * who led the workout, who attended, and any other details.
+	 * 
+	 * @return json encoded data of the backblast details
+	 */
+	public function parsePost($url) {
+		return $this->scraperDao->parsePost($url);
+	}
+
+	/*
 	public function addWorkout($data) {
 		// parse the post to get the information we need
 		$additionalInfo = $this->scraperDao->parsePost($data->post->url);
