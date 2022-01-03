@@ -29,6 +29,8 @@ class ChartData implements \JsonSerializable {
 				array_push($allSeries, '[' . $key . ',' . implode(",", $ser) . ']');
 			}
 			else {
+				// TODO:  I believe this else clause to be irrelevant as 
+				// 		  the implode will fail if $ser isn't an array
 				array_push($allSeries, '[' . implode(",", $ser) . ']');
 			}
 		}
