@@ -27,14 +27,17 @@ class WorkoutResource extends AbstractResource {
     {
         $response = null;
 
+        $startDate = isset($_GET['startDate']) ? $_GET['startDate'] : null;
+        $numDays = isset($_GET['numberOfDays']) ? $_GET['numberOfDays'] : null;
+        $aoId = isset($_GET['aoId']) ? $_GET['aoId'] : null;
+
         switch ($requestMethod) {
             case RequestMethod::GET:
                 if (isset($workoutId)) {
                     $response = $this->getWorkout($workoutId);
-                } else {
-                    $startDate = isset($_GET['startDate']) ? $_GET['startDate'] : null;
-                    $numDays = isset($_GET['numberOfDays']) ? $_GET['numberOfDays'] : null;
-                
+                } else if (isset($aoId)) {
+                    $response = $this->getWorkoutsByAO($aoId);
+                } else {        
                     $response = $this->getAllWorkouts($startDate, $numDays);
                 };
                 break;
@@ -92,6 +95,21 @@ class WorkoutResource extends AbstractResource {
         return $response;
     }
 
+    private function getWorkoutsByAo($aoId)
+    {
+        $response = null;
+
+        // id has to be numeric
+        if (is_numeric($aoId)) {
+            $result = $this->workoutService->getWorkoutsByAo($aoId);
+            $response = $this->createResponse(HttpStatusCode::HTTP_OK, json_encode($result));
+        }
+        else {
+            $response = $this->createResponse(HttpStatusCode::HTTP_BAD_REQUEST, null);
+        }
+
+        return $response;
+    }
     private function deleteWorkout($id)
     {
         $response = null;

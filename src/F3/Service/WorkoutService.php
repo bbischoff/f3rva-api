@@ -86,13 +86,13 @@ class WorkoutService {
 		return $this->processWorkoutResults($workouts);
 	}
 	
-	/*
 	public function getWorkoutsByAo($aoId) {
 		$workouts = $this->workoutRepo->findAllByAo($aoId);
 		
 		return $this->processWorkoutResults($workouts);
 	}
 	
+	/*
 	public function getWorkoutsByQ($qId) {
 		$workouts = $this->workoutRepo->findAllByQ($qId);
 		
