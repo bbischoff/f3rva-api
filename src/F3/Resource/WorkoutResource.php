@@ -23,8 +23,17 @@ class WorkoutResource extends AbstractResource {
     /**
      * Handles all supported requests
      */
-    public function processRequest($requestMethod, $workoutId)
+    public function processRequest($requestMethod)
     {
+        $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $uri = explode( '/', $uri );
+
+        // set the workoutId if it exists in the path
+        $workoutId = NULL;
+        if (isset($uri[2])) {
+            $workoutId = $uri[2];
+        }
+
         $response = null;
 
         $startDate = isset($_GET['startDate']) ? $_GET['startDate'] : null;

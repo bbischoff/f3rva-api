@@ -24,15 +24,9 @@ $requestMethod = $_SERVER["REQUEST_METHOD"];
 // router for supported endpoints
 switch($uri[1]) {
     case 'workout': 
-        // set the workoutId if it exists in the path
-        $workoutId = NULL;
-        if (isset($uri[2])) {
-            $workoutId = $uri[2];
-        }
-
         // delegate to the resource
         $resource = $container->get(WorkoutResource::class);
-        $response = $resource->processRequest($requestMethod, $workoutId);
+        $response = $resource->processRequest($requestMethod);
 
         // set header and response body
         header($response[WorkoutResource::HEADER_KEY]);
