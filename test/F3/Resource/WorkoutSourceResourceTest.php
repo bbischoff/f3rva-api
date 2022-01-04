@@ -23,7 +23,7 @@ class WorkoutSourceResourceTest extends TestCase {
              ->willReturn($mockedResult);
 
         $_GET['url'] = 'https://testurl';
-        
+
         /** @var \F3\Service\WorkoutService $workoutService */
         $workoutService = $mock;
         $workoutSourceResource = new WorkoutSourceResource($workoutService);
@@ -45,5 +45,20 @@ class WorkoutSourceResourceTest extends TestCase {
         $this->assertEquals(HttpStatusCode::httpHeaderFor(HttpStatusCode::HTTP_BAD_REQUEST), $result[WorkoutResource::HEADER_KEY], 'expected bad request');
         $this->assertNull($result[WorkoutResource::BODY_KEY], 'body null');
     }
+
+    public function testProcessRequestDefault() {
+        $mock = $this->getMockBuilder(WorkoutService::class)
+                               ->disableOriginalConstructor()
+                               ->getMock();
+                
+        /** @var \F3\Service\WorkoutService $workoutService */
+        $workoutService = $mock;
+        $workoutSourceResource = new WorkoutSourceResource($workoutService);
+        $result = $workoutSourceResource->processRequest('BADREQUEST');
+        
+        $this->assertEquals(HttpStatusCode::httpHeaderFor(HttpStatusCode::HTTP_METHOD_NOT_ALLOWED), $result[WorkoutResource::HEADER_KEY], 'status code mismatch');
+        $this->assertNull($result[WorkoutResource::BODY_KEY], 'null body');
+    }
+
 }
 ?>
