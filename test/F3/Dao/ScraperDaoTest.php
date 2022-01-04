@@ -34,7 +34,7 @@ class ScraperDaoTest extends TestCase {
         $html = $html . "       <div><ul>";
         $html = $html . "           <li><strong>When:</strong>1/3/2022</li>";
         $html = $html . "           <li><strong>QIC:</strong>Splinter</li>";
-        $html = $html . "           <li><strong>The PAX:</strong>Lockjaw, Bleeder, Upchuck</li>";
+        $html = $html . "           <li><strong>The PAX:</strong>Lockjaw, Bleeder,Upchuck & TYA and Handshake</li>";
         $html = $html . "       </div></ul>";
         $html = $html . "   </article>";
         $html = $html . "</body>";
@@ -48,7 +48,7 @@ class ScraperDaoTest extends TestCase {
 
         $this->assertEquals('author', $result->author, 'author mismatch');
         $this->assertEquals(date_parse('1/3/2022'), $result->date, 'date mismatch');
-        $this->assertEquals(['Lockjaw', 'Bleeder', 'Upchuck'], $result->pax, 'pax mismatch');
+        $this->assertEquals(['Lockjaw', 'Bleeder', 'Upchuck', 'TYA', 'Handshake'], $result->pax, 'pax mismatch');
         $this->assertEquals(['Splinter'], $result->q, 'q mismatch');
         $this->assertEquals(['Spider Run'], $result->tags, 'tags mismatch');
         $this->assertEquals('test title', $result->title, 'title mismatch');
