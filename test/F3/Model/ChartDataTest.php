@@ -93,5 +93,19 @@ class ChartDataTest extends TestCase {
 
         $this->assertEquals("'1/1','1/2'", $model->getSeriesKeysImploded(), 'series keys imploded mismatch');
     }
+
+    public function testGetXLabels() {
+        $model = new ChartData();
+        $labels = array( 
+            "2021" => "2021",
+            "2020" => "2020"
+        );
+        $model->setXLabels($labels);
+
+        $expected = array("2021", "2020");
+
+        $this->assertEquals($expected, $model->getXLabelsKeys(), 'keys mismatch');
+    }
+
 }
 ?>

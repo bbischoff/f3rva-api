@@ -19,5 +19,12 @@ class DatabaseTest extends TestCase {
         
         $this->assertTrue($db->getDatabase() instanceof PDO, 'pdo instance check');
     }
+
+    public function testGetInstance() {
+        $instance1 = Database::getInstance();
+        $instance2 = Database::getInstance();
+        
+        $this->assertEquals($instance1, $instance2, 'singleton check');
+    }
 }
 ?>
