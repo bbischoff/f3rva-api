@@ -92,7 +92,6 @@ class WorkoutService {
 		return $this->processWorkoutResults($workouts);
 	}
 	
-	/*
 	public function getWorkoutsByQ($qId) {
 		$workouts = $this->workoutRepo->findAllByQ($qId);
 		
@@ -104,7 +103,6 @@ class WorkoutService {
 		
 		return $this->processWorkoutResults($workouts);
 	}
-	*/
 
 	/**
 	 * Parses a backblast from the source and returns the details on

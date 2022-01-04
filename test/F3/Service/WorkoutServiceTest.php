@@ -169,6 +169,56 @@ class WorkoutServiceTest extends TestCase {
         $this->assertEquals('https://f3rva.org/2021/12/30/test-post', $result['1']->getBackblastURL(), 'url mismatch');
     }
 
+    public function testGetWorkoutsByQ() {
+        // create mocked response
+        $workout = array();
+        $workout['WORKOUT_ID'] = '1';
+		$workout['BACKBLAST_URL'] = 'https://f3rva.org/2021/12/30/test-post';
+		$workout['PAX_COUNT'] = '5';
+		$workout['TITLE'] = 'Test Post';
+		$workout['WORKOUT_DATE'] = '2021-12-30';
+        $workout['AO_ID'] = '2';
+        $workout['AO'] = 'Spider Run';
+        $workout['Q_ID'] = '3';
+        $workout['Q'] = 'Splinter';
+        $workoutArray = array();
+        array_push($workoutArray, $workout);
+
+        $this->workoutRepoMock->method('findAllByQ')
+                        ->willReturn($workoutArray);
+
+        $workoutService = new WorkoutService($this->memberService, $this->scraperDao, $this->workoutRepo, $this->database);
+        $result = $workoutService->getWorkoutsByQ('5');
+
+        $this->assertEquals('1', $result['1']->getWorkoutId(), 'workout id mismatch');
+        $this->assertEquals('https://f3rva.org/2021/12/30/test-post', $result['1']->getBackblastURL(), 'url mismatch');
+    }
+
+    public function testGetWorkoutsByPax() {
+        // create mocked response
+        $workout = array();
+        $workout['WORKOUT_ID'] = '1';
+		$workout['BACKBLAST_URL'] = 'https://f3rva.org/2021/12/30/test-post';
+		$workout['PAX_COUNT'] = '5';
+		$workout['TITLE'] = 'Test Post';
+		$workout['WORKOUT_DATE'] = '2021-12-30';
+        $workout['AO_ID'] = '2';
+        $workout['AO'] = 'Spider Run';
+        $workout['Q_ID'] = '3';
+        $workout['Q'] = 'Splinter';
+        $workoutArray = array();
+        array_push($workoutArray, $workout);
+
+        $this->workoutRepoMock->method('findAllByPax')
+                        ->willReturn($workoutArray);
+
+        $workoutService = new WorkoutService($this->memberService, $this->scraperDao, $this->workoutRepo, $this->database);
+        $result = $workoutService->getWorkoutsByPax('5');
+
+        $this->assertEquals('1', $result['1']->getWorkoutId(), 'workout id mismatch');
+        $this->assertEquals('https://f3rva.org/2021/12/30/test-post', $result['1']->getBackblastURL(), 'url mismatch');
+    }
+
     public function testParsePost() {
         $this->scraperDaoMock->method('parsePost')
                              ->willReturn('some value');

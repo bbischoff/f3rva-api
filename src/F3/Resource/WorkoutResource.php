@@ -29,14 +29,20 @@ class WorkoutResource extends AbstractResource {
 
         $startDate = isset($_GET['startDate']) ? $_GET['startDate'] : null;
         $numDays = isset($_GET['numberOfDays']) ? $_GET['numberOfDays'] : null;
-        $aoId = isset($_GET['aoId']) ? $_GET['aoId'] : null;
+        $ao = isset($_GET['ao']) ? $_GET['ao'] : null;
+        $q = isset($_GET['q']) ? $_GET['q'] : null;
+        $pax = isset($_GET['pax']) ? $_GET['pax'] : null;
 
         switch ($requestMethod) {
             case RequestMethod::GET:
                 if (isset($workoutId)) {
                     $response = $this->getWorkout($workoutId);
-                } else if (isset($aoId)) {
-                    $response = $this->getWorkoutsByAO($aoId);
+                } else if (isset($ao)) {
+                    $response = $this->getWorkoutsByAO($ao);
+                } else if (isset($q)) {
+                    $response = $this->getWorkoutsByQ($q);
+                } else if (isset($pax)) {
+                    $response = $this->getWorkoutsByPax($pax);
                 } else {        
                     $response = $this->getAllWorkouts($startDate, $numDays);
                 };
@@ -110,6 +116,39 @@ class WorkoutResource extends AbstractResource {
 
         return $response;
     }
+
+    private function getWorkoutsByQ($q)
+    {
+        $response = null;
+
+        // id has to be numeric
+        if (is_numeric($q)) {
+            $result = $this->workoutService->getWorkoutsByQ($q);
+            $response = $this->createResponse(HttpStatusCode::HTTP_OK, json_encode($result));
+        }
+        else {
+            $response = $this->createResponse(HttpStatusCode::HTTP_BAD_REQUEST, null);
+        }
+
+        return $response;
+    }
+
+    private function getWorkoutsByPax($paxId)
+    {
+        $response = null;
+
+        // id has to be numeric
+        if (is_numeric($paxId)) {
+            $result = $this->workoutService->getWorkoutsByPax($paxId);
+            $response = $this->createResponse(HttpStatusCode::HTTP_OK, json_encode($result));
+        }
+        else {
+            $response = $this->createResponse(HttpStatusCode::HTTP_BAD_REQUEST, null);
+        }
+
+        return $response;
+    }
+
     private function deleteWorkout($id)
     {
         $response = null;
