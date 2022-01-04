@@ -28,14 +28,16 @@ class WorkoutSourceResource extends AbstractResource {
 
         switch ($requestMethod) {
             case RequestMethod::GET:
-                $url = $_GET['url'];
-                    if (is_null($url)) {
-                        $response = $this->createResponse(HttpStatusCode::HTTP_BAD_REQUEST, null);
-                    }
-                    else {
-                        $result = $this->workoutService->parsePost($url);
-                        $response = $this->createResponse(HttpStatusCode::HTTP_OK, json_encode($result));
-                    }    
+                $url = isset($_GET['url']) ? $_GET['url'] : null;
+
+                if (is_null($url)) {
+                    $response = $this->createResponse(HttpStatusCode::HTTP_BAD_REQUEST, null);
+                }
+                else {
+                    $result = $this->workoutService->parsePost($url);
+                    $response = $this->createResponse(HttpStatusCode::HTTP_OK, json_encode($result));
+                }    
+
                 break;
             default:
                 $response = $this->createResponse(HttpStatusCode::HTTP_METHOD_NOT_ALLOWED, null);
