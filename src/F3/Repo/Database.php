@@ -29,8 +29,6 @@ class Database
         $this->_db = new PDO($dsn, $user, $pass, $opt);
     }
 
-    private function __clone(){}
-
     /**
      * @deprecated  Singleton functionality will be removed in the future, use DI instead
      */
