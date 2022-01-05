@@ -2,6 +2,9 @@
 namespace F3\Service;
 
 use F3\Dao\ScraperDao;
+use F3\Model\AO;
+use F3\Model\Member;
+use F3\Model\Response;
 use F3\Repo\Database;
 use F3\Repo\WorkoutRepository;
 use PHPUnit\Framework\TestCase;
@@ -228,6 +231,107 @@ class WorkoutServiceTest extends TestCase {
         $this->assertEquals('some value', $result, 'result mismatch');
     }
 
+    public function testAddWorkout() {
+        $additionalInfo = (object) array(
+			'author' => 'Splinter',
+			'date' => array('year' => 2022, 'month' => 1, 'day' => 5),
+			'pax' => ['Kubota', 'Upchuck'],
+			'q' => ['Splinter'], 
+			'tags' => ['First Watch'], 
+			'title' => 'Fun Title'
+		);
+        $this->scraperDaoMock->method('parsePost')
+                             ->willReturn($additionalInfo);
+        $pdoMock = $this->getMockBuilder(\PDO::class)
+                        ->disableOriginalConstructor()
+                        ->getMock();
+    
+        $this->databaseMock->method('getDatabase')
+                           ->willReturn($pdoMock);
+        $this->workoutRepoMock->method('save')
+                              ->willReturn('123');
+
+        // mock ao
+        $ao = (object) array('aoId' => '5', 'description' => 'Spider Run');
+        $this->workoutRepoMock->method('selectOrAddAo')
+                              ->willReturn($ao);
+        
+        $member = new Member();
+        $member->setMemberId('1');
+        $this->memberServiceMock->method('getOrAddMember')
+                                ->willReturn($member);
+
+        $pdoMock->expects($this->once())
+                ->method('commit');
+
+        $workoutService = new WorkoutService($this->memberService, $this->scraperDao, $this->workoutRepo, $this->database);
+        $response = $workoutService->addWorkout((object) array( 'post' => (object) array( 'url' => 'https://testurl')));
+
+        $this->assertEquals(Response::SUCCESS, $response->getCode(), 'expected success');
+        $this->assertEquals('123', $response->getId(), 'id mismatch');
+    }
+
+    public function testAddWorkoutFutureDate() {
+        $additionalInfo = (object) array(
+			'author' => 'Splinter',
+			'date' => array('year' => 2122, 'month' => 1, 'day' => 5),
+			'pax' => ['Kubota', 'Upchuck'],
+			'q' => ['Splinter'], 
+			'tags' => ['First Watch'], 
+			'title' => 'Fun Title'
+		);
+        $this->scraperDaoMock->method('parsePost')
+                             ->willReturn($additionalInfo);
+
+        $workoutService = new WorkoutService($this->memberService, $this->scraperDao, $this->workoutRepo, $this->database);
+        $response = $workoutService->addWorkout((object) array( 'post' => (object) array( 'url' => 'https://testurl')));
+
+        $this->assertEquals(Response::NOT_APPLICABLE, $response->getCode(), 'expected not applicable');
+        $this->assertNull($response->getId(), 'id expected to be null');
+    }
+
+    public function testAddWorkoutFailure() {
+        $additionalInfo = (object) array(
+			'author' => 'Splinter',
+			'date' => array('year' => 2022, 'month' => 1, 'day' => 5),
+			'pax' => ['Kubota', 'Upchuck'],
+			'q' => ['Splinter'], 
+			'tags' => ['First Watch'], 
+			'title' => 'Fun Title'
+		);
+        $this->scraperDaoMock->method('parsePost')
+                             ->willReturn($additionalInfo);
+        $pdoMock = $this->getMockBuilder(\PDO::class)
+                        ->disableOriginalConstructor()
+                        ->getMock();
+    
+        $this->databaseMock->method('getDatabase')
+                           ->willReturn($pdoMock);
+        $this->workoutRepoMock->method('save')
+                              ->willReturn('123');
+
+        // mock ao
+        $ao = (object) array('aoId' => '5', 'description' => 'Spider Run');
+        $this->workoutRepoMock->method('selectOrAddAo')
+                              ->willReturn($ao);
+        
+        $member = new Member();
+        $member->setMemberId('1');
+        $this->memberServiceMock->method('getOrAddMember')
+                                ->willReturn($member);
+
+        $pdoMock->method('beginTransaction')
+                ->willThrowException(new \Exception());
+        $pdoMock->expects($this->once())
+                ->method('rollback');
+
+        $workoutService = new WorkoutService($this->memberService, $this->scraperDao, $this->workoutRepo, $this->database);
+        $response = $workoutService->addWorkout((object) array( 'post' => (object) array( 'url' => 'https://testurl')));
+
+        $this->assertEquals(Response::FAILURE, $response->getCode(), 'expected failure');
+        $this->assertNotNull($response->getMessage(), 'expected a detail message');
+    }
+    
     public function testDeleteWorkout() {
         $pdoMock = $this->getMockBuilder(\PDO::class)
                         ->disableOriginalConstructor()
@@ -242,7 +346,6 @@ class WorkoutServiceTest extends TestCase {
         $this->assertTrue($result, 'delete expected to be true');
     }
 
-
     public function testDeleteWorkoutFalure() {
         $pdoMock = $this->getMockBuilder(\PDO::class)
                         ->disableOriginalConstructor()
@@ -252,7 +355,9 @@ class WorkoutServiceTest extends TestCase {
                      ->willReturn($pdoMock);
         $pdoMock->method('beginTransaction')
                 ->willThrowException(new \Exception());
-
+        $pdoMock->expects($this->once())
+                ->method('rollback');
+          
         $workoutService = new WorkoutService($this->memberService, $this->scraperDao, $this->workoutRepo, $this->database);
         $result = $workoutService->deleteWorkout(1);
 

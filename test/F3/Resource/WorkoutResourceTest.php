@@ -1,9 +1,11 @@
 <?php
 namespace F3\Resource;
 
+use F3\Model\Response;
 use PHPUnit\Framework\TestCase;
 use F3\Model\Workout;
 use F3\Service\WorkoutService;
+use F3\Util\DataRetriever;
 
 /**
  * @covers \F3\Resource\WorkoutResource
@@ -11,30 +13,42 @@ use F3\Service\WorkoutService;
  */
 class WorkoutResourceTest extends TestCase {
 
+    var $workoutServiceMock = null;
+    var $dataRetrieverMock = null;
+
+    /** @var \F3\Service\WorkoutService $workoutService */
+    var $workoutService = null;
+    /** @var \F3\Util\DataRetriever $dataRetriever */
+    var $dataRetriever = null;
+
     protected function setUp(): void
     {
         $_SERVER['REQUEST_URI'] = '/workout';
+
+        $this->workoutServiceMock = $this->getMockBuilder(WorkoutService::class)
+                                         ->disableOriginalConstructor()
+                                         ->getMock();
+        $this->dataRetrieverMock = $this->getMockBuilder(DataRetriever::class)
+                                        ->disableOriginalConstructor()
+                                        ->getMock();
+
+        $this->workoutService = $this->workoutServiceMock;
+        $this->dataRetriever = $this->dataRetrieverMock;
     }
 
     public function testProcessRequestGetWorkout() {
-        $mock = $this->getMockBuilder(WorkoutService::class)
-                               ->disableOriginalConstructor()
-                               ->getMock();
-        
         // create mocked response
         /** @var \F3\Model\Workout $workout */
         $workout = new Workout();
 		$workout->setWorkoutId('123');
         $workout->setTitle('Best Backblast Ever');
 
-        $mock->method('getWorkout')
-             ->willReturn($workout);
+        $this->workoutServiceMock->method('getWorkout')
+                                 ->willReturn($workout);
         
         $_SERVER['REQUEST_URI'] = '/workout/123';
 
-        /** @var \F3\Service\WorkoutService $workoutService */
-        $workoutService = $mock;
-        $workoutResource = new WorkoutResource($workoutService);
+        $workoutResource = new WorkoutResource($this->workoutService, $this->dataRetriever);
         $result = $workoutResource->processRequest(RequestMethod::GET);
 
         $this->assertEquals(HttpStatusCode::httpHeaderFor(HttpStatusCode::HTTP_OK), $result[WorkoutResource::HEADER_KEY], 'status code mismatch');
@@ -42,14 +56,9 @@ class WorkoutResourceTest extends TestCase {
     }
 
     public function testProcessRequestGetWorkoutNotNumeric() {
-        /** @var \F3\Service\WorkoutService $workoutService */
-        $workoutService = $this->getMockBuilder(WorkoutService::class)
-                               ->disableOriginalConstructor()
-                               ->getMock();
-
         $_SERVER['REQUEST_URI'] = '/workout/abc';
 
-        $workoutResource = new WorkoutResource($workoutService);
+        $workoutResource = new WorkoutResource($this->workoutService, $this->dataRetriever);
         $result = $workoutResource->processRequest(RequestMethod::GET);
         
         $this->assertEquals(HttpStatusCode::httpHeaderFor(HttpStatusCode::HTTP_BAD_REQUEST), $result[WorkoutResource::HEADER_KEY], 'not numeric bad request');
@@ -57,18 +66,12 @@ class WorkoutResourceTest extends TestCase {
     }
 
     public function testProcessRequestGetWorkoutNotFound() {
-        $mock = $this->getMockBuilder(WorkoutService::class)
-                               ->disableOriginalConstructor()
-                               ->getMock();
-        
-        $mock->method('getWorkouts')
-             ->willReturn(null);
+        $this->workoutServiceMock->method('getWorkouts')
+                                 ->willReturn(null);
         
         $_SERVER['REQUEST_URI'] = '/workout/123';
 
-        /** @var \F3\Service\WorkoutService $workoutService */
-        $workoutService = $mock;
-        $workoutResource = new WorkoutResource($workoutService);
+        $workoutResource = new WorkoutResource($this->workoutService, $this->dataRetriever);
         $result = $workoutResource->processRequest(RequestMethod::GET);
         
         $this->assertEquals(HttpStatusCode::httpHeaderFor(HttpStatusCode::HTTP_NOT_FOUND), $result[WorkoutResource::HEADER_KEY], 'numeric not found');
@@ -76,10 +79,6 @@ class WorkoutResourceTest extends TestCase {
     }
 
     public function testProcessRequestGetWorkouts() {
-        $mock = $this->getMockBuilder(WorkoutService::class)
-                               ->disableOriginalConstructor()
-                               ->getMock();
-        
         // create mocked response
         /** @var \F3\Model\Workout $workout */
         $workout = new Workout();
@@ -88,12 +87,10 @@ class WorkoutResourceTest extends TestCase {
         $workoutArray = array();
         $workoutArray['123'] = $workout;
 
-        $mock->method('getWorkouts')
-             ->willReturn($workoutArray);
+        $this->workoutServiceMock->method('getWorkouts')
+                                 ->willReturn($workoutArray);
         
-        /** @var \F3\Service\WorkoutService $workoutService */
-        $workoutService = $mock;
-        $workoutResource = new WorkoutResource($workoutService);
+        $workoutResource = new WorkoutResource($this->workoutService, $this->dataRetriever);
         $result = $workoutResource->processRequest(RequestMethod::GET);
         
         $this->assertEquals(HttpStatusCode::httpHeaderFor(HttpStatusCode::HTTP_OK), $result[WorkoutResource::HEADER_KEY], 'status code mismatch');
@@ -101,14 +98,9 @@ class WorkoutResourceTest extends TestCase {
     }
 
     public function testProcessRequestGetWorkoutsBadRequest() {
-        /** @var \F3\Service\WorkoutService $workoutService */
-        $workoutService = $this->getMockBuilder(WorkoutService::class)
-                               ->disableOriginalConstructor()
-                               ->getMock();
-
         $_GET['startDate'] = 'abc-not-a-date';
 
-        $workoutResource = new WorkoutResource($workoutService);
+        $workoutResource = new WorkoutResource($this->workoutService, $this->dataRetriever);
         $result = $workoutResource->processRequest(RequestMethod::GET);
         
         $this->assertEquals(HttpStatusCode::httpHeaderFor(HttpStatusCode::HTTP_BAD_REQUEST), $result[WorkoutResource::HEADER_KEY], 'not numeric bad request');
@@ -116,10 +108,6 @@ class WorkoutResourceTest extends TestCase {
     }
 
     public function testProcessRequestGetWorkoutsByAo() {
-        $mock = $this->getMockBuilder(WorkoutService::class)
-                               ->disableOriginalConstructor()
-                               ->getMock();
-        
         // create mocked response
         /** @var \F3\Model\Workout $workout */
         $workout = new Workout();
@@ -128,14 +116,12 @@ class WorkoutResourceTest extends TestCase {
         $workoutArray = array();
         $workoutArray['123'] = $workout;
 
-        $mock->method('getWorkoutsByAo')
-             ->willReturn($workoutArray);
+        $this->workoutServiceMock->method('getWorkoutsByAo')
+                                 ->willReturn($workoutArray);
         
         $_GET['ao'] = '5';
 
-        /** @var \F3\Service\WorkoutService $workoutService */
-        $workoutService = $mock;
-        $workoutResource = new WorkoutResource($workoutService);
+        $workoutResource = new WorkoutResource($this->workoutService, $this->dataRetriever);
         $result = $workoutResource->processRequest(RequestMethod::GET);
         
         $this->assertEquals(HttpStatusCode::httpHeaderFor(HttpStatusCode::HTTP_OK), $result[WorkoutResource::HEADER_KEY], 'status code mismatch');
@@ -143,14 +129,9 @@ class WorkoutResourceTest extends TestCase {
     }
 
     public function testProcessRequestGetWorkoutsByAoBadRequest() {
-        /** @var \F3\Service\WorkoutService $workoutService */
-        $workoutService = $this->getMockBuilder(WorkoutService::class)
-                               ->disableOriginalConstructor()
-                               ->getMock();
-
         $_GET['ao'] = 'abc';
 
-        $workoutResource = new WorkoutResource($workoutService);
+        $workoutResource = new WorkoutResource($this->workoutService, $this->dataRetriever);
         $result = $workoutResource->processRequest(RequestMethod::GET);
         
         $this->assertEquals(HttpStatusCode::httpHeaderFor(HttpStatusCode::HTTP_BAD_REQUEST), $result[WorkoutResource::HEADER_KEY], 'not numeric bad request');
@@ -158,10 +139,6 @@ class WorkoutResourceTest extends TestCase {
     }
 
     public function testProcessRequestGetWorkoutsByQ() {
-        $mock = $this->getMockBuilder(WorkoutService::class)
-                               ->disableOriginalConstructor()
-                               ->getMock();
-        
         // create mocked response
         /** @var \F3\Model\Workout $workout */
         $workout = new Workout();
@@ -170,14 +147,12 @@ class WorkoutResourceTest extends TestCase {
         $workoutArray = array();
         $workoutArray['123'] = $workout;
 
-        $mock->method('getWorkoutsByQ')
-             ->willReturn($workoutArray);
+        $this->workoutServiceMock->method('getWorkoutsByQ')
+                                 ->willReturn($workoutArray);
         
         $_GET['q'] = '5';
 
-        /** @var \F3\Service\WorkoutService $workoutService */
-        $workoutService = $mock;
-        $workoutResource = new WorkoutResource($workoutService);
+        $workoutResource = new WorkoutResource($this->workoutService, $this->dataRetriever);
         $result = $workoutResource->processRequest(RequestMethod::GET);
         
         $this->assertEquals(HttpStatusCode::httpHeaderFor(HttpStatusCode::HTTP_OK), $result[WorkoutResource::HEADER_KEY], 'status code mismatch');
@@ -185,14 +160,9 @@ class WorkoutResourceTest extends TestCase {
     }
 
     public function testProcessRequestGetWorkoutsByQBadRequest() {
-        /** @var \F3\Service\WorkoutService $workoutService */
-        $workoutService = $this->getMockBuilder(WorkoutService::class)
-                               ->disableOriginalConstructor()
-                               ->getMock();
-
         $_GET['q'] = 'abc';
 
-        $workoutResource = new WorkoutResource($workoutService);
+        $workoutResource = new WorkoutResource($this->workoutService, $this->dataRetriever);
         $result = $workoutResource->processRequest(RequestMethod::GET);
         
         $this->assertEquals(HttpStatusCode::httpHeaderFor(HttpStatusCode::HTTP_BAD_REQUEST), $result[WorkoutResource::HEADER_KEY], 'not numeric bad request');
@@ -200,10 +170,6 @@ class WorkoutResourceTest extends TestCase {
     }
 
     public function testProcessRequestGetWorkoutsByPax() {
-        $mock = $this->getMockBuilder(WorkoutService::class)
-                               ->disableOriginalConstructor()
-                               ->getMock();
-        
         // create mocked response
         /** @var \F3\Model\Workout $workout */
         $workout = new Workout();
@@ -212,14 +178,12 @@ class WorkoutResourceTest extends TestCase {
         $workoutArray = array();
         $workoutArray['123'] = $workout;
 
-        $mock->method('getWorkoutsByPax')
-             ->willReturn($workoutArray);
+        $this->workoutServiceMock->method('getWorkoutsByPax')
+                                 ->willReturn($workoutArray);
         
         $_GET['pax'] = '5';
 
-        /** @var \F3\Service\WorkoutService $workoutService */
-        $workoutService = $mock;
-        $workoutResource = new WorkoutResource($workoutService);
+        $workoutResource = new WorkoutResource($this->workoutService, $this->dataRetriever);
         $result = $workoutResource->processRequest(RequestMethod::GET);
         
         $this->assertEquals(HttpStatusCode::httpHeaderFor(HttpStatusCode::HTTP_OK), $result[WorkoutResource::HEADER_KEY], 'status code mismatch');
@@ -227,41 +191,76 @@ class WorkoutResourceTest extends TestCase {
     }
 
     public function testProcessRequestGetWorkoutsByPaxBadRequest() {
-        /** @var \F3\Service\WorkoutService $workoutService */
-        $workoutService = $this->getMockBuilder(WorkoutService::class)
-                               ->disableOriginalConstructor()
-                               ->getMock();
-
         $_GET['pax'] = 'abc';
 
-        $workoutResource = new WorkoutResource($workoutService);
+        $workoutResource = new WorkoutResource($this->workoutService, $this->dataRetriever);
         $result = $workoutResource->processRequest(RequestMethod::GET);
         
         $this->assertEquals(HttpStatusCode::httpHeaderFor(HttpStatusCode::HTTP_BAD_REQUEST), $result[WorkoutResource::HEADER_KEY], 'not numeric bad request');
         $this->assertNull($result[WorkoutResource::BODY_KEY], 'body null on get bad request');
     }
 
-    public function testProcessRequestDeleteWorkout() {
-        $mock = $this->getMockBuilder(WorkoutService::class)
-                               ->disableOriginalConstructor()
-                               ->getMock();
+    public function testProcessRequestPostWorkout() {
+        // create mocked response
+        $response = new Response();
+        $response->setCode(Response::SUCCESS);
+        $response->setId('123');
+
+        $this->workoutServiceMock->method('addWorkout')
+                                 ->willReturn($response);
+        $this->dataRetrieverMock->method('retrieve')
+                                ->willReturn(json_encode(array('name' => 'value')));
         
+        $workoutResource = new WorkoutResource($this->workoutService, $this->dataRetriever);
+        $result = $workoutResource->processRequest(RequestMethod::POST);
+        
+        $this->assertEquals(HttpStatusCode::httpHeaderFor(HttpStatusCode::HTTP_OK), $result[WorkoutResource::HEADER_KEY], 'status code mismatch');
+        $this->assertEquals(json_encode($response), $result[WorkoutResource::BODY_KEY], 'expected json result');
+    }
+
+    public function testProcessRequestPostWorkoutErrorAdding() {
+        // create mocked response
+        $response = new Response();
+        $response->setCode(Response::FAILURE);
+
+        $this->workoutServiceMock->method('addWorkout')
+                                 ->willReturn($response);
+        $this->dataRetrieverMock->method('retrieve')
+                                ->willReturn(json_encode(array('name' => 'value')));
+        
+        $workoutResource = new WorkoutResource($this->workoutService, $this->dataRetriever);
+        $result = $workoutResource->processRequest(RequestMethod::POST);
+        
+        $this->assertEquals(HttpStatusCode::httpHeaderFor(HttpStatusCode::HTTP_BAD_REQUEST), $result[WorkoutResource::HEADER_KEY], 'invalid add bad request');
+        $this->assertNull($result[WorkoutResource::BODY_KEY], 'body null on bad request');
+    }
+
+    public function testProcessRequestPostWorkoutNoBody() {
+        $this->dataRetrieverMock->method('retrieve')
+                                ->willReturn(null);
+        
+        $workoutResource = new WorkoutResource($this->workoutService, $this->dataRetriever);
+        $result = $workoutResource->processRequest(RequestMethod::POST);
+        
+        $this->assertEquals(HttpStatusCode::httpHeaderFor(HttpStatusCode::HTTP_BAD_REQUEST), $result[WorkoutResource::HEADER_KEY], 'no body bad request');
+        $this->assertNull($result[WorkoutResource::BODY_KEY], 'body null on bad request');
+    }
+
+    public function testProcessRequestDeleteWorkout() {
         // create mocked response
         /** @var \F3\Model\Workout $workout */
         $workout = new Workout();
 		$workout->setWorkoutId('123');
         $workout->setTitle('To be deleted');
 
-        $mock->method('getWorkout')
-             ->willReturn($workout);
-        $mock->method('deleteWorkout')
-             ->willReturn(true);
+        $this->workoutServiceMock->method('getWorkout')
+                                 ->willReturn($workout);
+        $this->workoutServiceMock->method('deleteWorkout')
+                                 ->willReturn(true);
         
         $_SERVER['REQUEST_URI'] = '/workout/123';
 
-        /** @var \F3\Service\WorkoutService $workoutService */
-        $workoutService = $mock;
-        $workoutResource = new WorkoutResource($workoutService);
+        $workoutResource = new WorkoutResource($this->workoutService, $this->dataRetriever);
         $result = $workoutResource->processRequest(RequestMethod::DELETE);
         
         $this->assertEquals(HttpStatusCode::httpHeaderFor(HttpStatusCode::HTTP_OK), $result[WorkoutResource::HEADER_KEY], 'status code mismatch');
@@ -269,18 +268,12 @@ class WorkoutResourceTest extends TestCase {
     }
 
     public function testProcessRequestDeleteWorkoutBadRequest() {
-        $mock = $this->getMockBuilder(WorkoutService::class)
-                               ->disableOriginalConstructor()
-                               ->getMock();
-        
-        $mock->method('deleteWorkout')
+        $this->workoutServiceMock->method('deleteWorkout')
              ->willReturn(true);
         
         $_SERVER['REQUEST_URI'] = '/workout/abc';
 
-        /** @var \F3\Service\WorkoutService $workoutService */
-        $workoutService = $mock;
-        $workoutResource = new WorkoutResource($workoutService);
+        $workoutResource = new WorkoutResource($this->workoutService, $this->dataRetriever);
         $result = $workoutResource->processRequest(RequestMethod::DELETE);
         
         $this->assertEquals(HttpStatusCode::httpHeaderFor(HttpStatusCode::HTTP_BAD_REQUEST), $result[WorkoutResource::HEADER_KEY], 'not numeric bad request');
@@ -288,20 +281,14 @@ class WorkoutResourceTest extends TestCase {
     }
 
     public function testProcessRequestDeleteWorkoutNotFound() {
-        $mock = $this->getMockBuilder(WorkoutService::class)
-                               ->disableOriginalConstructor()
-                               ->getMock();
-        
-        $mock->method('getWorkout')
-             ->willReturn(null);
-        $mock->method('deleteWorkout')
-             ->willReturn(true);
+        $this->workoutServiceMock->method('getWorkout')
+                                 ->willReturn(null);
+        $this->workoutServiceMock->method('deleteWorkout')
+                                 ->willReturn(true);
         
         $_SERVER['REQUEST_URI'] = '/workout/123';
 
-        /** @var \F3\Service\WorkoutService $workoutService */
-        $workoutService = $mock;
-        $workoutResource = new WorkoutResource($workoutService);
+        $workoutResource = new WorkoutResource($this->workoutService, $this->dataRetriever);
         $result = $workoutResource->processRequest(RequestMethod::DELETE);
         
         $this->assertEquals(HttpStatusCode::httpHeaderFor(HttpStatusCode::HTTP_NOT_FOUND), $result[WorkoutResource::HEADER_KEY], 'delete not found');
@@ -309,26 +296,20 @@ class WorkoutResourceTest extends TestCase {
     }
 
     public function testProcessRequestDeleteWorkoutServerError() {
-        $mock = $this->getMockBuilder(WorkoutService::class)
-                               ->disableOriginalConstructor()
-                               ->getMock();
-        
         // create mocked response
         /** @var \F3\Model\Workout $workout */
         $workout = new Workout();
 		$workout->setWorkoutId('123');
         $workout->setTitle('To be deleted');
 
-        $mock->method('getWorkout')
-             ->willReturn($workout);
-        $mock->method('deleteWorkout')
-             ->willReturn(false);
+        $this->workoutServiceMock->method('getWorkout')
+                                 ->willReturn($workout);
+        $this->workoutServiceMock->method('deleteWorkout')
+                                 ->willReturn(false);
         
         $_SERVER['REQUEST_URI'] = '/workout/123';
 
-        /** @var \F3\Service\WorkoutService $workoutService */
-        $workoutService = $mock;
-        $workoutResource = new WorkoutResource($workoutService);
+        $workoutResource = new WorkoutResource($this->workoutService, $this->dataRetriever);
         $result = $workoutResource->processRequest(RequestMethod::DELETE);
         
         $this->assertEquals(HttpStatusCode::httpHeaderFor(HttpStatusCode::HTTP_INTERNAL_SERVER_ERROR), $result[WorkoutResource::HEADER_KEY], 'status code mismatch');
@@ -336,13 +317,7 @@ class WorkoutResourceTest extends TestCase {
     }
 
     public function testProcessRequestDefault() {
-        $mock = $this->getMockBuilder(WorkoutService::class)
-                               ->disableOriginalConstructor()
-                               ->getMock();
-                
-        /** @var \F3\Service\WorkoutService $workoutService */
-        $workoutService = $mock;
-        $workoutResource = new WorkoutResource($workoutService);
+        $workoutResource = new WorkoutResource($this->workoutService, $this->dataRetriever);
         $result = $workoutResource->processRequest('BADREQUEST');
         
         $this->assertEquals(HttpStatusCode::httpHeaderFor(HttpStatusCode::HTTP_METHOD_NOT_ALLOWED), $result[WorkoutResource::HEADER_KEY], 'status code mismatch');

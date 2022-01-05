@@ -3,7 +3,9 @@ namespace F3\Service;
 
 use F3\Dao\ScraperDao;
 use F3\Model\Member;
+use F3\Model\Response;
 use F3\Model\Workout;
+use F3\Model\WorkoutResponse;
 use F3\Repo\Database;
 use F3\Repo\WorkoutRepository;
 use F3\Service\MemberService;
@@ -86,18 +88,33 @@ class WorkoutService {
 		return $this->processWorkoutResults($workouts);
 	}
 	
+	/**
+	 * Retrieves all workouts for a particular AO
+	 * 
+	 * @return array of Workout
+	 */
 	public function getWorkoutsByAo($aoId) {
 		$workouts = $this->workoutRepo->findAllByAo($aoId);
 		
 		return $this->processWorkoutResults($workouts);
 	}
 	
+	/**
+	 * Retrieves all workouts for a particular Q
+	 * 
+	 * @return array of Workout
+	 */
 	public function getWorkoutsByQ($qId) {
 		$workouts = $this->workoutRepo->findAllByQ($qId);
 		
 		return $this->processWorkoutResults($workouts);
 	}
 	
+	/**
+	 * Retrieves all workouts for a particular PAX member
+	 * 
+	 * @return array of Workout
+	 */
 	public function getWorkoutsByPax($paxId) {
 		$workouts = $this->workoutRepo->findAllByPax($paxId);
 		
@@ -114,45 +131,56 @@ class WorkoutService {
 		return $this->scraperDao->parsePost($url);
 	}
 
-	/*
+	/**
+	 * Adds a new workout
+	 * 
+	 * @return \F3\Model\Response results of the attempt
+	 */
 	public function addWorkout($data) {
 		// parse the post to get the information we need
 		$additionalInfo = $this->scraperDao->parsePost($data->post->url);
 		error_log('additionalInfo: ' . json_encode($additionalInfo));
 		
-		$workoutId = null;
+		$response = new Response();
+
+		// skip if it's a workout in the future
+		if ($this->futureWorkout($additionalInfo)) {
+			$response->setCode(Response::NOT_APPLICABLE);
+		} 
+		else {
+			$db = $this->database->getDatabase();
 		
-		// validate the workout
-		if ($this->validateWorkout($additionalInfo)) {
-			$db = Database::getInstance()->getDatabase();
 			try {
 				$db->beginTransaction();
 				
 				// insert the workout
-				//error_log('adding workout: ' . $data->post->title . ' | ' . $additionalInfo->dateTime . '|' . $data->post->url);
-				$workoutId = $this->workoutRepo->save($data->post->title, $additionalInfo->date, $data->post->url);
+				$response->setId($this->workoutRepo->save($additionalInfo->title, $additionalInfo->date, $data->post->url));
 				
 				// add the aos
-				$this->saveWorkoutAos($workoutId, $additionalInfo->tags);
+				$this->saveWorkoutAos($response->getId(), $additionalInfo->tags);
 				
 				// add the qs
-				$this->saveWorkoutQs($workoutId, $additionalInfo->q);
+				$this->saveWorkoutQs($response->getId(), $additionalInfo->q);
 				
 				// add the pax members
-				$this->saveWorkoutMembers($workoutId, $additionalInfo->pax);
+				$this->saveWorkoutMembers($response->getId(), $additionalInfo->pax);
 				
 				$db->commit();
+				$response->setCode(Response::SUCCESS);
 			}
 			catch (\Exception $e) {
 				$db->rollBack();
 				error_log($e);
-				throw $e;
+				$response->setCode(Response::FAILURE);
+				$response->setId(null);
+				$response->setMessage($e->getMessage());
 			}
 		}
 		
-		return $workoutId;
+		return $response;
 	}
 	
+	/*
 	public function refreshWorkout($workoutId) {
 		// get the workout
 		$workout = $this->getWorkout($workoutId);
@@ -321,7 +349,6 @@ class WorkoutService {
 		return $workout;
 	}
 	
-	/*
 	private function saveWorkoutAos($workoutId, $aos) {
 		foreach ($aos as $ao) {
 			$ao = $this->workoutRepo->selectOrAddAo($ao);
@@ -343,18 +370,17 @@ class WorkoutService {
 		}
 	}
 	
-	private function validateWorkout($additionalInfo) {
+	private function futureWorkout($additionalInfo) {
 		// check to see if this workout is in the future.  if it is then skip
 		$dateArray = $additionalInfo->date;
 		$dateStr = $dateArray['year'] . '-' . $dateArray['month'] . '-' . $dateArray['day'];
 		if(strtotime(date('m/d/y', time())) < strtotime($dateStr)) {
 			error_log('date is in the future');
-			return false;
+			return true;
 		}
 		
-		return true;
+		return false;
 	}
-	*/
 }
 
 ?>

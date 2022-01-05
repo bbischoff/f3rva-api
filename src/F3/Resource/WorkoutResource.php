@@ -3,6 +3,7 @@
 namespace F3\Resource;
 
 use F3\Service\WorkoutService;
+use F3\Util\DataRetriever;
 use F3\Util\DateUtil;
 
 /*
@@ -10,14 +11,16 @@ use F3\Util\DateUtil;
  */
 class WorkoutResource extends AbstractResource {
 
+    private $dataRetriever;
     private $workoutService;
 
     /**
      * Main constructor
      */
-    public function __construct(WorkoutService $workoutService)
+    public function __construct(WorkoutService $workoutService, DataRetriever $dataRetriever)
     {
         $this->workoutService = $workoutService;
+        $this->dataRetriever = $dataRetriever;
     }
 
     /**
@@ -36,14 +39,15 @@ class WorkoutResource extends AbstractResource {
 
         $response = null;
 
-        $startDate = isset($_GET['startDate']) ? $_GET['startDate'] : null;
-        $numDays = isset($_GET['numberOfDays']) ? $_GET['numberOfDays'] : null;
-        $ao = isset($_GET['ao']) ? $_GET['ao'] : null;
-        $q = isset($_GET['q']) ? $_GET['q'] : null;
-        $pax = isset($_GET['pax']) ? $_GET['pax'] : null;
-
         switch ($requestMethod) {
             case RequestMethod::GET:
+                // retrieve various potential filters
+                $startDate = isset($_GET['startDate']) ? $_GET['startDate'] : null;
+                $numDays = isset($_GET['numberOfDays']) ? $_GET['numberOfDays'] : null;
+                $ao = isset($_GET['ao']) ? $_GET['ao'] : null;
+                $q = isset($_GET['q']) ? $_GET['q'] : null;
+                $pax = isset($_GET['pax']) ? $_GET['pax'] : null;
+
                 if (isset($workoutId)) {
                     $response = $this->getWorkout($workoutId);
                 } else if (isset($ao)) {
@@ -56,9 +60,12 @@ class WorkoutResource extends AbstractResource {
                     $response = $this->getAllWorkouts($startDate, $numDays);
                 };
                 break;
-            // RequestMethod::POST:
-            //     $response = $this->createUserFromRequest();
-            //     break;
+            case RequestMethod::POST:
+                $jsonStr = $this->dataRetriever->retrieve();
+                $json = json_decode($jsonStr);
+            
+                $response = $this->createWorkout($json);
+                break;
             // RequestMethod::PUT:
             //     $response = $this->updateUserFromRequest($this->userId);
             //     break;
@@ -153,6 +160,26 @@ class WorkoutResource extends AbstractResource {
         }
         else {
             $response = $this->createResponse(HttpStatusCode::HTTP_BAD_REQUEST, null);
+        }
+
+        return $response;
+    }
+
+    private function createWorkout($json) {
+        $response = null;
+
+        if (is_null($json)) {
+            $response = $this->createResponse(HttpStatusCode::HTTP_BAD_REQUEST, null);
+        }
+        else {
+            $result = $this->workoutService->addWorkout($json);
+
+            if ($result->getCode() <= 0) {
+                $response = $this->createResponse(HttpStatusCode::HTTP_BAD_REQUEST, null);
+            }
+            else {
+                $response = $this->createResponse(HttpStatusCode::HTTP_OK, json_encode($result));
+            }
         }
 
         return $response;
