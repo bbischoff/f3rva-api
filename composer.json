@@ -1,4 +1,6 @@
 {
+    "name": "F3-API",
+    "description": "API for all big data related functions",
     "autoload": {
         "psr-4": {
             "": "src/"
