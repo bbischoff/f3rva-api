@@ -246,6 +246,127 @@ class WorkoutResourceTest extends TestCase {
         $this->assertNull($result[WorkoutResource::BODY_KEY], 'body null on bad request');
     }
 
+    public function testProcessRequestPutWorkout() {
+        // create mocked response
+        $response = new Response();
+        $response->setCode(Response::SUCCESS);
+        $response->setId('123');
+
+        $this->workoutServiceMock->method('refreshWorkout')
+                                 ->willReturn($response);
+        
+        $_SERVER['REQUEST_URI'] = '/workout/123';
+
+        $workoutResource = new WorkoutResource($this->workoutService, $this->dataRetriever);
+        $result = $workoutResource->processRequest(RequestMethod::PUT);
+        
+        $this->assertEquals(HttpStatusCode::httpHeaderFor(HttpStatusCode::HTTP_OK), $result[WorkoutResource::HEADER_KEY], 'status code mismatch');
+        $this->assertEquals(json_encode($response), $result[WorkoutResource::BODY_KEY], 'expected json result');
+    }
+
+    public function testProcessRequestPutWorkoutNotFound() {
+        // create mocked response
+        $response = new Response();
+        $response->setCode(Response::NOT_FOUND);
+
+        $this->workoutServiceMock->method('refreshWorkout')
+                                 ->willReturn($response);
+        
+        $_SERVER['REQUEST_URI'] = '/workout/94949494';
+
+        $workoutResource = new WorkoutResource($this->workoutService, $this->dataRetriever);
+        $result = $workoutResource->processRequest(RequestMethod::PUT);
+        
+        $this->assertEquals(HttpStatusCode::httpHeaderFor(HttpStatusCode::HTTP_NOT_FOUND), $result[WorkoutResource::HEADER_KEY], 'status code mismatch');
+        $this->assertNull($result[WorkoutResource::BODY_KEY], 'body null on not found');
+    }
+
+    public function testProcessRequestPutWorkoutFailure() {
+        // create mocked response
+        $response = new Response();
+        $response->setCode(Response::FAILURE);
+
+        $this->workoutServiceMock->method('refreshWorkout')
+                                 ->willReturn($response);
+        
+        $_SERVER['REQUEST_URI'] = '/workout/94949494';
+
+        $workoutResource = new WorkoutResource($this->workoutService, $this->dataRetriever);
+        $result = $workoutResource->processRequest(RequestMethod::PUT);
+        
+        $this->assertEquals(HttpStatusCode::httpHeaderFor(HttpStatusCode::HTTP_BAD_REQUEST), $result[WorkoutResource::HEADER_KEY], 'status code mismatch');
+        $this->assertNull($result[WorkoutResource::BODY_KEY], 'body null on bad request');
+    }
+
+    public function testProcessRequestsPutWorkout() {
+        // create mocked response
+        $response = new Response();
+        $response->setCode(Response::SUCCESS);
+
+        $this->workoutServiceMock->method('refreshWorkouts')
+                                 ->willReturn($response);
+        $this->dataRetrieverMock->method('retrieve')
+                                ->willReturn('{"numDays": "5"}');
+
+        $workoutResource = new WorkoutResource($this->workoutService, $this->dataRetriever);
+        $result = $workoutResource->processRequest(RequestMethod::PUT);
+        
+        $this->assertEquals(HttpStatusCode::httpHeaderFor(HttpStatusCode::HTTP_OK), $result[WorkoutResource::HEADER_KEY], 'expected OK');
+        $this->assertNotNull($result[WorkoutResource::BODY_KEY], 'body not null on update');
+    }
+
+    public function testProcessRequestsPutWorkoutPartial() {
+        // create mocked response
+        $response = new Response();
+        $response->setCode(Response::PARTIAL);
+
+        $this->workoutServiceMock->method('refreshWorkouts')
+                                 ->willReturn($response);
+        $this->dataRetrieverMock->method('retrieve')
+                                ->willReturn('{"numDays": "5"}');
+
+        $workoutResource = new WorkoutResource($this->workoutService, $this->dataRetriever);
+        $result = $workoutResource->processRequest(RequestMethod::PUT);
+        
+        $this->assertEquals(HttpStatusCode::httpHeaderFor(HttpStatusCode::HTTP_OK), $result[WorkoutResource::HEADER_KEY], 'expected OK');
+        $this->assertNotNull($result[WorkoutResource::BODY_KEY], 'body not null on update');
+    }
+
+    public function testProcessRequestsPutWorkoutFailure() {
+        // create mocked response
+        $response = new Response();
+        $response->setCode(Response::FAILURE);
+
+        $this->workoutServiceMock->method('refreshWorkouts')
+                                 ->willReturn($response);
+        $this->dataRetrieverMock->method('retrieve')
+                                ->willReturn('{"numDays": "5"}');
+
+        $workoutResource = new WorkoutResource($this->workoutService, $this->dataRetriever);
+        $result = $workoutResource->processRequest(RequestMethod::PUT);
+        
+        $this->assertEquals(HttpStatusCode::httpHeaderFor(HttpStatusCode::HTTP_BAD_REQUEST), $result[WorkoutResource::HEADER_KEY], 'failure bad request');
+        $this->assertNull($result[WorkoutResource::BODY_KEY], 'body null on update');
+    }
+
+    public function testProcessRequestsPutWorkoutNullNumDaysBadRequest() {
+        $workoutResource = new WorkoutResource($this->workoutService, $this->dataRetriever);
+        $result = $workoutResource->processRequest(RequestMethod::PUT);
+        
+        $this->assertEquals(HttpStatusCode::httpHeaderFor(HttpStatusCode::HTTP_BAD_REQUEST), $result[WorkoutResource::HEADER_KEY], 'no num days bad request');
+        $this->assertNull($result[WorkoutResource::BODY_KEY], 'body null on update');
+    }
+
+    public function testProcessRequestsPutWorkoutNonNumericNumDaysBadRequest() {
+        $this->dataRetrieverMock->method('retrieve')
+                                ->willReturn('{"numDays": "asdf"}');
+        $workoutResource = new WorkoutResource($this->workoutService, $this->dataRetriever);
+        $result = $workoutResource->processRequest(RequestMethod::PUT);
+        
+        $this->assertEquals(HttpStatusCode::httpHeaderFor(HttpStatusCode::HTTP_BAD_REQUEST), $result[WorkoutResource::HEADER_KEY], 'non numeric numDays bad request');
+        $this->assertNull($result[WorkoutResource::BODY_KEY], 'body null on update');
+    }
+
     public function testProcessRequestDeleteWorkout() {
         // create mocked response
         /** @var \F3\Model\Workout $workout */

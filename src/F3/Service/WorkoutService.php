@@ -5,7 +5,6 @@ use F3\Dao\ScraperDao;
 use F3\Model\Member;
 use F3\Model\Response;
 use F3\Model\Workout;
-use F3\Model\WorkoutResponse;
 use F3\Repo\Database;
 use F3\Repo\WorkoutRepository;
 use F3\Service\MemberService;
@@ -180,72 +179,103 @@ class WorkoutService {
 		return $response;
 	}
 	
-	/*
 	public function refreshWorkout($workoutId) {
+		$response = new Response();
+
 		// get the workout
 		$workout = $this->getWorkout($workoutId);
-		
-		// parse the post to get the information we need
-		$additionalInfo = $this->scraperDao->parsePost($workout->getBackblastUrl());
-		error_log('additionalInfo: ' . json_encode($additionalInfo));
-		
-		// validate the workout
-		if ($this->validateWorkout($additionalInfo)) {
-			$db = Database::getInstance()->getDatabase();
-			try {
-				$db->beginTransaction();
-				
-				// update the workout
-				$this->workoutRepo->update($workoutId, $workout->getTitle(), $additionalInfo->date, $workout->getBackblastUrl());
-				
-				// delete previous aos
-				$this->workoutRepo->deleteWorkoutAos($workoutId);
-				
-				// add the aos
-				$this->saveWorkoutAos($workoutId, $additionalInfo->tags);
-				
-				// delete the previous qs
-				$this->workoutRepo->deleteWorkoutQs($workoutId);
-				
-				// add the qs
-				$this->saveWorkoutQs($workoutId, $additionalInfo->q);
-				
-				// delete the previous members
-				$this->workoutRepo->deleteWorkoutMembers($workoutId);
-				
-				// add the pax members
-				$this->saveWorkoutMembers($workoutId, $additionalInfo->pax);
-	
-				$db->commit();
-			}
-			catch (\Exception $e) {
-				$db->rollBack();
-				error_log($e);
-				throw $e;
-			}
+		if ($workout == null) {
+			$response->setCode(Response::NOT_FOUND);
 		}
+		else {
+			// parse the post to get the information we need
+			$additionalInfo = $this->scraperDao->parsePost($workout->getBackblastUrl());
+			error_log('additionalInfo: ' . json_encode($additionalInfo));
+			
+			// skip if it's a workout in the future
+			if ($this->futureWorkout($additionalInfo)) {
+				$response->setCode(Response::NOT_APPLICABLE);
+			} 
+			else {
+				$db = $this->database->getDatabase();
+
+				try {
+					$db->beginTransaction();
+					
+					// update the workout
+					$this->workoutRepo->update($workoutId, $workout->getTitle(), $additionalInfo->date, $workout->getBackblastUrl());
+					
+					// delete previous aos
+					$this->workoutRepo->deleteWorkoutAos($workoutId);
+					
+					// add the aos
+					$this->saveWorkoutAos($workoutId, $additionalInfo->tags);
+					
+					// delete the previous qs
+					$this->workoutRepo->deleteWorkoutQs($workoutId);
+					
+					// add the qs
+					$this->saveWorkoutQs($workoutId, $additionalInfo->q);
+					
+					// delete the previous members
+					$this->workoutRepo->deleteWorkoutMembers($workoutId);
+					
+					// add the pax members
+					$this->saveWorkoutMembers($workoutId, $additionalInfo->pax);
 		
-		return $workoutId;
+					$db->commit();
+					$response->setCode(Response::SUCCESS);
+					$response->setId($workoutId);
+				}
+				catch (\Exception $e) {
+					$db->rollBack();
+					error_log($e);
+					$response->setCode(Response::FAILURE);
+					$response->setId(null);
+					$response->setMessage($e->getMessage());
+				} // catch
+			} // future if
+		} // found if
+		
+		return $response;
 	}
-	
+
 	public function refreshWorkouts($numDays) {
 		error_log('refreshing the past ' . $numDays . ' days');
 		// get all workouts in the most recent days
 		$workouts = $this->getWorkouts(DateUtil::getDefaultDate(null), $numDays);
 		
-		$refreshed = array();
+		$response = new Response();
+		$resultsArray = array();
 		
 		// loop through all workouts that meet criteria
 		foreach ($workouts as $workout) {
 			// refresh the workout
-			$this->refreshWorkout($workout->getWorkoutId());
-			
-			$refreshed[$workout->getWorkoutId()] = $workout->getTitle();
+			$result = $this->refreshWorkout($workout->getWorkoutId());
+			array_push($resultsArray, $result);
+
+			if ($result->getCode() == Response::SUCCESS) {
+				if (is_null($response->getCode()) || $response->getCode() == Response::SUCCESS) {
+					$response->setCode(Response::SUCCESS);
+				}
+				else {
+					$response->setCode(Response::PARTIAL);
+				}
+			}
+			else {
+				if ($response->getCode() == Response::SUCCESS) {
+					$response->setCode(Response::PARTIAL);
+				}
+				else {
+					$response->setCode(Response::FAILURE);
+				}
+			}
 		}
+
+		$response->setResults($resultsArray);
 		
-		return $refreshed;
+		return $response;
 	}
-	*/
 	
 	public function deleteWorkout($workoutId) {
 		$success = false;

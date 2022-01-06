@@ -54,19 +54,7 @@ class WorkoutServiceTest extends TestCase {
     }
 
     public function testGetWorkout() {   
-        // create mocked response
-        $workout = array();
-        $workout['WORKOUT_ID'] = '1';
-		$workout['BACKBLAST_URL'] = 'https://f3rva.org/2021/12/30/test-post';
-		$workout['PAX_COUNT'] = '5';
-		$workout['TITLE'] = 'Test Post';
-		$workout['WORKOUT_DATE'] = '2021-12-30';
-        $workout['AO_ID'] = '2';
-        $workout['AO'] = 'Spider Run';
-        $workout['Q_ID'] = '3';
-        $workout['Q'] = 'Splinter';
-        $workoutArray = array();
-        array_push($workoutArray, $workout);
+        $workoutArray = $this->createTestWorkoutArray();
 
         // mock the second AO and Q
         $workout2 = array();
@@ -80,11 +68,7 @@ class WorkoutServiceTest extends TestCase {
         $this->workoutRepoMock->method('find')
                               ->willReturn($workoutArray);
 
-        $pax = array();
-        $pax['MEMBER_ID'] = '4';
-        $pax['F3_NAME'] = 'Upchuck';
-        $paxArray = array();
-        array_push($paxArray, $pax);
+        $paxArray = $this->createTestPaxArray();
         $this->workoutRepoMock->method('findPax')
                               ->willReturn($paxArray);
 
@@ -105,19 +89,7 @@ class WorkoutServiceTest extends TestCase {
     }
 
     public function testGetWorkouts() {
-        // create mocked response
-        $workout = array();
-        $workout['WORKOUT_ID'] = '1';
-		$workout['BACKBLAST_URL'] = 'https://f3rva.org/2021/12/30/test-post';
-		$workout['PAX_COUNT'] = '5';
-		$workout['TITLE'] = 'Test Post';
-		$workout['WORKOUT_DATE'] = '2021-12-30';
-        $workout['AO_ID'] = '2';
-        $workout['AO'] = 'Spider Run';
-        $workout['Q_ID'] = '3';
-        $workout['Q'] = 'Splinter';
-        $workoutArray = array();
-        array_push($workoutArray, $workout);
+        $workoutArray = $this->createTestWorkoutArray();
 
         // mock the second AO and Q
         $workout2 = array();
@@ -148,19 +120,7 @@ class WorkoutServiceTest extends TestCase {
     }
 
     public function testGetWorkoutsByAo() {
-        // create mocked response
-        $workout = array();
-        $workout['WORKOUT_ID'] = '1';
-		$workout['BACKBLAST_URL'] = 'https://f3rva.org/2021/12/30/test-post';
-		$workout['PAX_COUNT'] = '5';
-		$workout['TITLE'] = 'Test Post';
-		$workout['WORKOUT_DATE'] = '2021-12-30';
-        $workout['AO_ID'] = '2';
-        $workout['AO'] = 'Spider Run';
-        $workout['Q_ID'] = '3';
-        $workout['Q'] = 'Splinter';
-        $workoutArray = array();
-        array_push($workoutArray, $workout);
+        $workoutArray = $this->createTestWorkoutArray();
 
         $this->workoutRepoMock->method('findAllByAo')
                         ->willReturn($workoutArray);
@@ -173,19 +133,7 @@ class WorkoutServiceTest extends TestCase {
     }
 
     public function testGetWorkoutsByQ() {
-        // create mocked response
-        $workout = array();
-        $workout['WORKOUT_ID'] = '1';
-		$workout['BACKBLAST_URL'] = 'https://f3rva.org/2021/12/30/test-post';
-		$workout['PAX_COUNT'] = '5';
-		$workout['TITLE'] = 'Test Post';
-		$workout['WORKOUT_DATE'] = '2021-12-30';
-        $workout['AO_ID'] = '2';
-        $workout['AO'] = 'Spider Run';
-        $workout['Q_ID'] = '3';
-        $workout['Q'] = 'Splinter';
-        $workoutArray = array();
-        array_push($workoutArray, $workout);
+        $workoutArray = $this->createTestWorkoutArray();
 
         $this->workoutRepoMock->method('findAllByQ')
                         ->willReturn($workoutArray);
@@ -198,19 +146,7 @@ class WorkoutServiceTest extends TestCase {
     }
 
     public function testGetWorkoutsByPax() {
-        // create mocked response
-        $workout = array();
-        $workout['WORKOUT_ID'] = '1';
-		$workout['BACKBLAST_URL'] = 'https://f3rva.org/2021/12/30/test-post';
-		$workout['PAX_COUNT'] = '5';
-		$workout['TITLE'] = 'Test Post';
-		$workout['WORKOUT_DATE'] = '2021-12-30';
-        $workout['AO_ID'] = '2';
-        $workout['AO'] = 'Spider Run';
-        $workout['Q_ID'] = '3';
-        $workout['Q'] = 'Splinter';
-        $workoutArray = array();
-        array_push($workoutArray, $workout);
+        $workoutArray = $this->createTestWorkoutArray();
 
         $this->workoutRepoMock->method('findAllByPax')
                         ->willReturn($workoutArray);
@@ -331,7 +267,143 @@ class WorkoutServiceTest extends TestCase {
         $this->assertEquals(Response::FAILURE, $response->getCode(), 'expected failure');
         $this->assertNotNull($response->getMessage(), 'expected a detail message');
     }
+
+    public function testRefreshWorkout() {
+        // mock workouts
+        $workoutArray = $this->createTestWorkoutArray();
+        $this->workoutRepoMock->method('find')
+                              ->willReturn($workoutArray);
+
+        // mock pax
+        $paxArray = $this->createTestPaxArray();
+        $this->workoutRepoMock->method('findPax')
+                              ->willReturn($paxArray);
+
+        // mock parse post
+        $additionalInfo = (object) array(
+			'author' => 'Splinter',
+			'date' => array('year' => 2022, 'month' => 1, 'day' => 5),
+			'pax' => ['Kubota', 'Upchuck'],
+			'q' => ['Splinter'], 
+			'tags' => ['First Watch'], 
+			'title' => 'Fun Title'
+		);
+        $this->scraperDaoMock->method('parsePost')
+                             ->willReturn($additionalInfo);
+
+        $pdoMock = $this->getMockBuilder(\PDO::class)
+                        ->disableOriginalConstructor()
+                        ->getMock();
     
+        $this->databaseMock->method('getDatabase')
+                           ->willReturn($pdoMock);
+
+        // mock ao
+        $ao = (object) array('aoId' => '5', 'description' => 'Spider Run');
+        $this->workoutRepoMock->method('selectOrAddAo')
+                              ->willReturn($ao);
+        
+        $member = new Member();
+        $member->setMemberId('1');
+        $this->memberServiceMock->method('getOrAddMember')
+                                ->willReturn($member);
+
+        $pdoMock->expects($this->once())
+                ->method('commit');
+
+        $workoutService = new WorkoutService($this->memberService, $this->scraperDao, $this->workoutRepo, $this->database);
+        $response = $workoutService->refreshWorkout('123');
+
+        $this->assertEquals(Response::SUCCESS, $response->getCode(), 'expected success');
+        $this->assertEquals('123', $response->getId(), 'id mismatch');
+    }
+
+    public function testRefreshWorkoutNotFound() {
+        $workoutArray = $this->createTestWorkoutArray();
+        $this->workoutRepoMock->method('find')
+                              ->willReturn(array());
+
+        $workoutService = new WorkoutService($this->memberService, $this->scraperDao, $this->workoutRepo, $this->database);
+        $response = $workoutService->refreshWorkout('94949494');
+
+        $this->assertEquals(Response::NOT_FOUND, $response->getCode(), 'expected not found');
+        $this->assertNull($response->getId(), 'id should be null');
+    }
+
+    public function testRefreshWorkoutFutureDateNotApplicable() {
+        // mock workouts
+        $workoutArray = $this->createTestWorkoutArray();
+        $this->workoutRepoMock->method('find')
+                              ->willReturn($workoutArray);
+
+        // mock pax
+        $paxArray = $this->createTestPaxArray();
+        $this->workoutRepoMock->method('findPax')
+                              ->willReturn($paxArray);
+
+        // mock parse post
+        $additionalInfo = (object) array(
+			'author' => 'Splinter',
+			'date' => array('year' => 2122, 'month' => 1, 'day' => 5),
+			'pax' => ['Kubota', 'Upchuck'],
+			'q' => ['Splinter'], 
+			'tags' => ['First Watch'], 
+			'title' => 'Fun Title'
+		);
+        $this->scraperDaoMock->method('parsePost')
+                             ->willReturn($additionalInfo);
+
+        $workoutService = new WorkoutService($this->memberService, $this->scraperDao, $this->workoutRepo, $this->database);
+        $response = $workoutService->refreshWorkout('123');
+
+        $this->assertEquals(Response::NOT_APPLICABLE, $response->getCode(), 'expected not applicable');
+        $this->assertNull($response->getId(), 'id expected to be null');
+    }
+
+    public function testRefreshWorkoutError() {
+        // mock workouts
+        $workoutArray = $this->createTestWorkoutArray();
+        $this->workoutRepoMock->method('find')
+                              ->willReturn($workoutArray);
+
+        // mock pax
+        $paxArray = $this->createTestPaxArray();
+        $this->workoutRepoMock->method('findPax')
+                              ->willReturn($paxArray);
+
+        // mock parse post
+        $additionalInfo = (object) array(
+			'author' => 'Splinter',
+			'date' => array('year' => 2022, 'month' => 1, 'day' => 5),
+			'pax' => ['Kubota', 'Upchuck'],
+			'q' => ['Splinter'], 
+			'tags' => ['First Watch'], 
+			'title' => 'Fun Title'
+		);
+        $this->scraperDaoMock->method('parsePost')
+                             ->willReturn($additionalInfo);
+
+        $pdoMock = $this->getMockBuilder(\PDO::class)
+                        ->disableOriginalConstructor()
+                        ->getMock();
+    
+        $this->databaseMock->method('getDatabase')
+                           ->willReturn($pdoMock);
+
+        $pdoMock->method('beginTransaction')
+                ->willThrowException(new \Exception());
+        $pdoMock->expects($this->never())
+                ->method('commit');
+        $pdoMock->expects($this->once())
+                ->method('rollback');
+
+        $workoutService = new WorkoutService($this->memberService, $this->scraperDao, $this->workoutRepo, $this->database);
+        $response = $workoutService->refreshWorkout('123');
+
+        $this->assertEquals(Response::FAILURE, $response->getCode(), 'expected failure');
+        $this->assertNull($response->getId(), 'id expected to be null');
+    }
+
     public function testDeleteWorkout() {
         $pdoMock = $this->getMockBuilder(\PDO::class)
                         ->disableOriginalConstructor()
@@ -362,5 +434,33 @@ class WorkoutServiceTest extends TestCase {
         $result = $workoutService->deleteWorkout(1);
 
         $this->assertFalse($result, 'delete expected to be false');
+    }
+
+    private function createTestWorkoutArray() {
+        // create mocked response
+        $workout = array();
+        $workout['WORKOUT_ID'] = '1';
+        $workout['BACKBLAST_URL'] = 'https://f3rva.org/2021/12/30/test-post';
+        $workout['PAX_COUNT'] = '5';
+        $workout['TITLE'] = 'Test Post';
+        $workout['WORKOUT_DATE'] = '2021-12-30';
+        $workout['AO_ID'] = '2';
+        $workout['AO'] = 'Spider Run';
+        $workout['Q_ID'] = '3';
+        $workout['Q'] = 'Splinter';
+        $workoutArray = array();
+        array_push($workoutArray, $workout);
+
+        return $workoutArray;
+    }
+
+    private function createTestPaxArray() {
+        $pax = array();
+        $pax['MEMBER_ID'] = '4';
+        $pax['F3_NAME'] = 'Upchuck';
+        $paxArray = array();
+        array_push($paxArray, $pax);
+
+        return $paxArray;
     }
 }

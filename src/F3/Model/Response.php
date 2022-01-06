@@ -5,10 +5,13 @@ class Response implements \JsonSerializable {
     const FAILURE = 0;
     const SUCCESS = 1;
 	const NOT_APPLICABLE = 2;
+	const NOT_FOUND = 3;
+	const PARTIAL = 4;
 
     private $id = null;
 	private $code = null;
 	private $message = null;
+	private $results = null;
 
 	public function getId() {
 		return $this->id;
@@ -33,6 +36,14 @@ class Response implements \JsonSerializable {
 	public function setMessage($message) {
 		$this->message = $message;
 	}
+
+	public function getResults() {
+		return $this->results;
+	}
+
+	public function setResults($results) {
+		$this->results = $results;
+	}
 	
 	public function jsonSerialize()
 	{
@@ -40,7 +51,8 @@ class Response implements \JsonSerializable {
 			'response' => [
 				'code' => $this->getCode(),
 				'id' => $this->getId(),
-				'message' => $this->getMessage()
+				'message' => $this->getMessage(),
+				'results' => $this->getResults()
 			]
 		];
 	}

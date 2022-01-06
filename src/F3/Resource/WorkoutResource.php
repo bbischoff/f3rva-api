@@ -2,6 +2,7 @@
 
 namespace F3\Resource;
 
+use F3\Model\Response;
 use F3\Service\WorkoutService;
 use F3\Util\DataRetriever;
 use F3\Util\DateUtil;
@@ -66,9 +67,16 @@ class WorkoutResource extends AbstractResource {
             
                 $response = $this->createWorkout($json);
                 break;
-            // RequestMethod::PUT:
-            //     $response = $this->updateUserFromRequest($this->userId);
-            //     break;
+            case RequestMethod::PUT:
+                if (isset($workoutId)) {
+                    $response = $this->updateWorkout($workoutId);
+                } else {
+                    $jsonStr = $this->dataRetriever->retrieve();
+                    $json = json_decode($jsonStr);
+
+                    $response = $this->updateWorkouts($json);
+                }
+                break;
             case RequestMethod::DELETE:
                 $response = $this->deleteWorkout($workoutId);
                 break;
@@ -174,11 +182,53 @@ class WorkoutResource extends AbstractResource {
         else {
             $result = $this->workoutService->addWorkout($json);
 
-            if ($result->getCode() <= 0) {
-                $response = $this->createResponse(HttpStatusCode::HTTP_BAD_REQUEST, null);
+            if ($result->getCode() == Response::SUCCESS) {
+                $response = $this->createResponse(HttpStatusCode::HTTP_OK, json_encode($result));
             }
             else {
+                $response = $this->createResponse(HttpStatusCode::HTTP_BAD_REQUEST, null);
+            }
+        }
+
+        return $response;
+    }
+
+    private function updateWorkout($workoutId) {
+        // PRECONDITION:  $workoutId is not null
+        $response = null;
+
+        $result = $this->workoutService->refreshWorkout($workoutId);
+
+        if ($result->getCode() == Response::SUCCESS) {
+            $response = $this->createResponse(HttpStatusCode::HTTP_OK, json_encode($result));
+        }
+        else if ($result->getCode() == Response::NOT_FOUND) {
+            $response = $this->createResponse(HttpStatusCode::HTTP_NOT_FOUND, null);
+        }
+        else {
+            $response = $this->createResponse(HttpStatusCode::HTTP_BAD_REQUEST, null);
+        }
+
+        return $response;
+    }
+
+    private function updateWorkouts($json) {
+        $response = null;
+
+        if (is_null($json) || empty($json->numDays)) {
+            $response = $this->createResponse(HttpStatusCode::HTTP_BAD_REQUEST, null);
+        }
+        else if (!is_numeric($json->numDays)) {
+            $response = $this->createResponse(HttpStatusCode::HTTP_BAD_REQUEST, null);
+        }
+        else {
+            $result = $this->workoutService->refreshWorkouts($json->numDays);
+
+            if ($result->getCode() == Response::SUCCESS || $result->getCode() == Response::PARTIAL) {
                 $response = $this->createResponse(HttpStatusCode::HTTP_OK, json_encode($result));
+            }
+            else {
+                $response = $this->createResponse(HttpStatusCode::HTTP_BAD_REQUEST, null);
             }
         }
 

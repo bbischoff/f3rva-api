@@ -18,11 +18,13 @@ class ResponseTest extends TestCase {
         $model->setCode(Response::SUCCESS);
         $model->setId(1);
         $model->setMessage('message');
+        $model->setResults('results');
         
         $expected = [ 'response' => [
             'id' => 1,
             'code' => Response::SUCCESS,
-            'message' => 'message'
+            'message' => 'message',
+            'results' => 'results'
         ]];
 
         $this->assertEquals($expected, $model->jsonSerialize(), 'json mismatch');
