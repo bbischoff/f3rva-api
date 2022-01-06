@@ -16,6 +16,7 @@ jobs:
       - name: Install composer dependencies
         run: composer install --prefer-dist
 
+      # unit test command
       - name: Run unit tests
         run: ./vendor/bin/phpunit --testdox test
 
