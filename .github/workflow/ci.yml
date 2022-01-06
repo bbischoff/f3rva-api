@@ -1,0 +1,20 @@
+name: F3RVA API CI
+
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate
+      
+      - name: Install composer dependencies
+        run: composer install --prefer-dist
+
+      - name: Run unit tests
+        run: ./vendor/bin/phpunit --testdox test
+
