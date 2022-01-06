@@ -1,9 +1,10 @@
 name: F3RVA API CI
 
-on:
-  push:
+on: [push]
 
 jobs:
+
+  # unit test configuration
   test:
     runs-on: ubuntu-latest
     steps:
