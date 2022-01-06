@@ -1,5 +1,5 @@
 {
-    "name": "F3-API",
+    "name": "f3rva/f3-api",
     "description": "API for all big data related functions",
     "autoload": {
         "psr-4": {
