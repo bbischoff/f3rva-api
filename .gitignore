@@ -1,4 +1,5 @@
 .vscode/
+db/
 vendor/
 public/test.php
 
