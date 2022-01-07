@@ -1,6 +1,7 @@
 .vscode/
 db/
-vendor/
+output/
 public/test.php
+vendor/
 
 .env
