@@ -18,5 +18,7 @@ jobs:
 
       # unit test command
       - name: Run unit tests
-        run: ./vendor/bin/phpunit --testdox test
+        run: |
+          mkdir db
+          ./vendor/bin/phpunit --testdox test
 
