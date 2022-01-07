@@ -169,7 +169,7 @@ class WorkoutService {
 			}
 			catch (\Exception $e) {
 				$db->rollBack();
-				error_log($e);
+				error_log('error adding workout, message: ' . $e->getMessage());
 				$response->setCode(Response::FAILURE);
 				$response->setId(null);
 				$response->setMessage($e->getMessage());
@@ -229,7 +229,7 @@ class WorkoutService {
 				}
 				catch (\Exception $e) {
 					$db->rollBack();
-					error_log($e);
+					error_log('error refreshing workout, message: ' . $e->getMessage());
 					$response->setCode(Response::FAILURE);
 					$response->setId(null);
 					$response->setMessage($e->getMessage());
@@ -301,7 +301,7 @@ class WorkoutService {
 		}
 		catch (\Exception $e) {
 			$db->rollBack();
-			error_log($e);
+			error_log('error deleting workout, message: ' . $e->getMessage());
 		}
 		
 		return $success;
