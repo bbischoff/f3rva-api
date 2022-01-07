@@ -247,14 +247,14 @@ class MemberRepositoryTest extends TestCase {
         $this->pdoMock->method('prepare')
                               ->willReturn($statementMock);
         $this->pdoMock->method('lastInsertId')
-                              ->willReturn(1);
+                              ->willReturn('1');
                         
         $statementMock->expects($this->once())
                       ->method('execute');
 
         $memberRepo = new MemberRepository($this->database);
         $id = $memberRepo->save('Splinter');
-        $this->assertEquals(1, $id, 'inserted ID mismatch');
+        $this->assertEquals('1', $id, 'inserted ID mismatch');
     }
 
     public function testDelete() {
