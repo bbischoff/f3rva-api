@@ -7,6 +7,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @covers \F3\Repo\Database
  * @backupGlobals enabled
+ * @requires extension mysqli
  */
 class DatabaseTest extends TestCase {
     
