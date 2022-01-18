@@ -20,4 +20,6 @@ jobs:
       - name: Run unit tests
         run: |
           composer test
+        env:
+          XDEBUG_MODE: coverage
 
