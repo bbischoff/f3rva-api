@@ -18,8 +18,7 @@
             "# creating sqlite db folder",
             "mkdir -p db"
         ],
-        "coverage": "phpunit --testdox --coverage-html output --coverage-filter src test",
-        "test": "phpunit --testdox test",
+        "test": "phpunit",
         "local": "php -S localhost:8000 -t public"
     }
 }
