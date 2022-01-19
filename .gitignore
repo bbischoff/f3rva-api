@@ -1,5 +1,9 @@
 .vscode/
-vendor/
+db/
+output/
 public/test.php
+vendor/
+test-output/
 
 .env
+.phpunit.result.cache

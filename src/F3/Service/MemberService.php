@@ -119,7 +119,7 @@ class MemberService {
 		}
 		catch (\Exception $e) {
 			$db->rollBack();
-			error_log($e);
+			error_log('error adding alias, message: ' . $e->getMessage());
 		}
 	}
 	

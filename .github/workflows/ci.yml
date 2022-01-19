@@ -1,11 +1,14 @@
 name: F3RVA API CI
 
-on: [push]
+on: 
+  push:
+  pull_request:
+    branches: [main]
 
 jobs:
 
   # unit test configuration
-  test:
+  unit-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -16,6 +19,10 @@ jobs:
       - name: Install composer dependencies
         run: composer install --prefer-dist
 
+      # unit test command
       - name: Run unit tests
-        run: ./vendor/bin/phpunit --testdox test
+        run: |
+          composer test
+        env:
+          XDEBUG_MODE: coverage
 
