@@ -19,7 +19,11 @@
             "# creating sqlite db folder",
             "mkdir -p db"
         ],
-        "test": "phpunit",
-        "local": "php -S localhost:8000 -t public"
+        "test": [
+            "phpunit"
+        ],
+        "local": [
+            "ENVIRONMENT=local php -S localhost:8000 -t public"
+        ]
     }
 }

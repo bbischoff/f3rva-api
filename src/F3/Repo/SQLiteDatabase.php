@@ -11,8 +11,11 @@ class SQLiteDatabase implements Database
 {
     private $_db;
 
-    public function __construct() {
-        $dsn = "sqlite:" . Settings::DB_LOCAL_PATH;
+    /**
+     * @Inject({"localDbPath" = "db.local.path"})
+     */
+    public function __construct($localDbPath) {
+        $dsn = "sqlite:" . $localDbPath;
     
         $this->_db = new PDO($dsn);
     }

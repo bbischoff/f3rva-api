@@ -11,14 +11,8 @@ class MySqlDatabase implements Database
 {
     private $_db;
 
-    public function __construct() {
-        $host = Settings::DB_HOST;
-        $db   = Settings::DB_NAME;
-        $user = Settings::DB_USER;
-        $pass = Settings::DB_PASS; 
-        $charset = Settings::DB_CHARSET;
-
-        $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+    public function __construct($host, $name, $user, $pass, $charset) {
+        $dsn = "mysql:host=$host;dbname=$name;charset=$charset";
         $opt = [
             PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
