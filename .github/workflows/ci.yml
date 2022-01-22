@@ -2,24 +2,34 @@ name: F3RVA API CI
 
 on: 
   push:
+    branches: [ $default-branch, 'feature/**' ]
   pull_request:
-    branches: [main]
+    branches: [ $default-branch ]
 
 jobs:
 
   # unit test configuration
-  unit-test:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout from repo
+        uses: actions/checkout@v2
 
       - name: Validate composer.json and composer.lock
-        run: composer validate
+        run: composer validate --strict
+        
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v2
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-      - name: Install composer dependencies
       
       - name: Install composer dependencies
         run: composer install --prefer-dist
 
-      # unit test command
       - name: Run unit tests
         run: |
           composer test

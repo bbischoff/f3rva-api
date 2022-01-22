@@ -1,6 +1,7 @@
 <?php
 namespace F3\Repo;
 
+use F3\Settings;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
@@ -15,7 +16,8 @@ class SQLiteDatabaseTest extends TestCase {
     }
 
     public function testGetDatabase() {
-        $db = new SQLiteDatabase();
+        $container = Settings::getDIContainer();
+        $db = $container->get(SQLiteDatabase::class);
         
         $this->assertTrue($db->getDatabase() instanceof PDO, 'pdo instance check');
     }

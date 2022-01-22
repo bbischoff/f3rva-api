@@ -1,9 +1,10 @@
 {
     "name": "f3rva/f3-api",
     "description": "API for all big data related functions",
+    "license": "MIT",
     "autoload": {
         "psr-4": {
-            "": "src/"
+            "F3\\": "src/F3"
         }
     },
     "require": {
@@ -18,7 +19,11 @@
             "# creating sqlite db folder",
             "mkdir -p db"
         ],
-        "test": "phpunit",
-        "local": "php -S localhost:8000 -t public"
+        "test": [
+            "phpunit"
+        ],
+        "local": [
+            "ENVIRONMENT=local php -S localhost:8000 -t public"
+        ]
     }
 }
