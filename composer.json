@@ -1,6 +1,6 @@
 {
-    "name": "f3rva/f3-api",
-    "description": "API for all big data related functions",
+    "name": "f3rva/f3rva-api",
+    "description": "API package for all big data related functions",
     "license": "MIT",
     "autoload": {
         "psr-4": {
