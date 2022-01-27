@@ -13,12 +13,12 @@
 			<directory>./src</directory>
 		</include>
 		<report>
-			<html outputDirectory="./test-output/coverage" lowUpperBound="60" highLowerBound="90"/>
-			<text outputFile="php://stdout" showUncoveredFiles="true"/>
+			<html outputDirectory="./test-output/coverage" lowUpperBound="60" highLowerBound="90" showUncoveredFiles="true"/>
+			<text outputFile="php://stdout" lowUpperBound="60" highLowerBound="90" showUncoveredFiles="true"/>
 		</report>
 	</coverage>
 	<logging>
-        <junit outputFile="./test-output/junit.xml" />
-        <testdoxHtml outputFile="./test-output/testdox.html" />
+        <junit outputFile="./test-output/junit/junit.xml" />
+        <testdoxHtml outputFile="./test-output/testdox/testdox.html" />
     </logging>
 </phpunit>

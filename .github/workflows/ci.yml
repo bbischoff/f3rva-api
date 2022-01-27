@@ -1,10 +1,8 @@
 name: F3RVA API CI
 
 on: 
-  push:
-    branches: [ $default-branch, 'feature/**' ]
-  pull_request:
-    branches: [ $default-branch ]
+  - pull_request
+  - push
 
 jobs:
 
@@ -35,4 +33,10 @@ jobs:
           composer test
         env:
           XDEBUG_MODE: coverage
+      
+      - uses: actions/upload-artifact@v2
+        with:
+          name: code-coverage
+          path: ./test-output/coverage
+          retention-days: 7
 
