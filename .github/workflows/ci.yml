@@ -38,7 +38,7 @@ jobs:
         id: create-distribution
         run: |
           mkdir dist
-          tar -cvfz dist/f3rva-api-LATEST.tar.gz \
+          tar cvfz dist/f3rva-api-LATEST.tar.gz \
           LICENSE \
           bootstrap.php \
           config \
