@@ -2,52 +2,54 @@ name: F3RVA API Release
 
 on: 
   push:
-    tags: [ '*' ]
+    tags: 
+      - '*'
 
 jobs:
 
-  # create distribution and deploy
-  distribution:
+  # create release
+  release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout from repo
+      - name: Set Variables
+        id: vars
+        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
+
+      - name: Checkout tag
         uses: actions/checkout@v2
-
-      - name: Validate composer.json and composer.lock
-        run: composer validate --strict
-        
-      - name: Cache Composer packages
-        id: composer-cache
-        uses: actions/cache@v2
         with:
-          path: vendor
-          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-php-      - name: Install composer dependencies
-      
-      - name: Install composer dependencies
-        run: composer install --prefer-dist
+          ref: '${{ steps.vars.outputs.tag }}'
 
-      - name: Run unit tests
-        run: |
-          composer test
-        env:
-          XDEBUG_MODE: coverage
-      
-      - name: Create distribution
+      - name: Create distribution package
         id: create-distribution
         run: |
           mkdir dist
-          tar cvfz dist/f3rva-api-LATEST.tar.gz \
+          tar cvfz dist/f3rva-api-${{ steps.vars.outputs.tag }}.tar.gz \
           LICENSE \
           bootstrap.php \
           config \
           public \
           src \
           vendor \
-        
-      - uses: actions/upload-artifact@v2
+
+      - name: Create release
+        uses: actions/create-release@v1
+        id: create-release
         with:
-          name: distribution
-          path: ./dist/f3rva-api*.tar.gz
-          retention-days: 7
+          draft: false
+          prerelease: false
+          release_name: 'release-${{ steps.vars.outputs.tag }}'
+          tag_name: ${{ steps.vars.outputs.tag }}
+          body_path: CHANGELOG.md
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      
+      - name: Add build artifacts
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
+          asset_path: ./dist/dist/f3rva-api-${{ steps.vars.outputs.tag }}.tar.gz
+          asset_name: f3rva-api-${{ steps.vars.outputs.tag }}.tar.gz
+          asset_content_type: application/gzip
