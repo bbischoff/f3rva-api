@@ -1,13 +1,13 @@
-name: F3RVA API CI
+name: F3RVA API Release
 
 on: 
-  - pull_request
-  - push
+  push:
+    tags: [ '*' ]
 
 jobs:
 
-  # unit test configuration
-  build:
+  # create distribution and deploy
+  distribution:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout from repo
@@ -33,3 +33,21 @@ jobs:
           composer test
         env:
           XDEBUG_MODE: coverage
+      
+      - name: Create distribution
+        id: create-distribution
+        run: |
+          mkdir dist
+          tar cvfz dist/f3rva-api-LATEST.tar.gz \
+          LICENSE \
+          bootstrap.php \
+          config \
+          public \
+          src \
+          vendor \
+        
+      - uses: actions/upload-artifact@v2
+        with:
+          name: distribution
+          path: ./dist/f3rva-api*.tar.gz
+          retention-days: 7
