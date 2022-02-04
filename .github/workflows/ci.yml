@@ -14,7 +14,9 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Debug
-        run: ls -lR
+        run: |
+          pwd
+          ls -laR
       - name: Validate composer.json and composer.lock
         uses: ./.github/workflows/setup-composer.yml
         
