@@ -33,21 +33,3 @@ jobs:
           composer test
         env:
           XDEBUG_MODE: coverage
-      
-      - name: Create distribution
-        id: create-distribution
-        run: |
-          mkdir dist
-          tar cvfz dist/f3rva-api-LATEST.tar.gz \
-          LICENSE \
-          bootstrap.php \
-          config \
-          public \
-          src \
-          vendor \
-        
-      - uses: actions/upload-artifact@v2
-        with:
-          name: distribution
-          path: ./dist/f3rva-api*.tar.gz
-          retention-days: 7
