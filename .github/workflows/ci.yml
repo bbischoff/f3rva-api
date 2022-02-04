@@ -13,6 +13,8 @@ jobs:
       - name: Checkout from repo
         uses: actions/checkout@v2
 
+      - name: Debug
+        run: ls -lR
       - name: Validate composer.json and composer.lock
         uses: ./.github/workflows/setup-composer.yml
         
