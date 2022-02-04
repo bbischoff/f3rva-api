@@ -15,8 +15,7 @@ jobs:
 
       - name: Debug
         run: |
-          pwd
-          ls -laR
+          ls -la /home/runner/work/f3rva-api/f3rva-api/.github/workflows/setup-composer.yml
       - name: Validate composer.json and composer.lock
         uses: ./.github/workflows/setup-composer.yml
         
