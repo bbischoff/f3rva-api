@@ -13,11 +13,22 @@ jobs:
       - name: Checkout from repo
         uses: actions/checkout@v2
 
-      - name: Debug
-        run: |
-          ls -la /home/runner/work/f3rva-api/f3rva-api/.github/workflows/setup-composer.yml
+#      - name: Validate composer.json and composer.lock
+#        uses: ./.github/workflows/setup-composer.yml
       - name: Validate composer.json and composer.lock
-        uses: ./.github/workflows/setup-composer.yml
+        run: composer validate --strict
+        
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v2
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-      - name: Install composer dependencies
+      
+      - name: Install composer dependencies
+        run: composer install --prefer-dist
         
       - name: Run unit tests
         run: |
