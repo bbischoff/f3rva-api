@@ -23,6 +23,8 @@ jobs:
 
     - uses: robinraju/release-downloader@v1.3
       with:
+        repository: "f3rva/f3rva-api"
+        latest: false
         tag: "${{ github.event.inputs.versionNumber }}"
         fileName: "f3rva-api-${{ github.event.inputs.versionNumber }}.tar.gz"
         out-file-path: "dist"
