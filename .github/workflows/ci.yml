@@ -13,22 +13,8 @@ jobs:
       - name: Checkout from repo
         uses: actions/checkout@v2
 
-#      - name: Validate composer.json and composer.lock
-#        uses: ./.github/workflows/setup-composer.yml
       - name: Validate composer.json and composer.lock
-        run: composer validate --strict
-        
-      - name: Cache Composer packages
-        id: composer-cache
-        uses: actions/cache@v2
-        with:
-          path: vendor
-          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-php-      - name: Install composer dependencies
-      
-      - name: Install composer dependencies
-        run: composer install --prefer-dist
+        uses: ./.github/workflows/setup-composer.yml
         
       - name: Run unit tests
         run: |
