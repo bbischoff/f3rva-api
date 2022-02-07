@@ -3,10 +3,6 @@ name: F3RVA API CD
 on: 
   workflow_dispatch:
     inputs:
-      releasePrefix:
-        description: 'Prefix for all release names'
-        required: true
-        default: 'release'
       versionNumber:
         description: 'Version to deploy'
         required: true
@@ -24,20 +20,17 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup environment
-        id: setup-environment
-        run: |
-          mkdir dist
-      
-      - name: Retrieve the deployment file from the release package
-        uses: dsaltares/fetch-gh-release-asset@master
-        with:
-          version: "${{ github.event.inputs.versionNumber }}"
-          file: "f3rva-api-${{ github.event.inputs.versionNumber }}.tar.gz"
-          target: "dist/f3rva-api-${{ github.event.inputs.versionNumber }}.tar.gz"
-          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: List the tar contents
-        id: tar-contents
-        run: |
-          tar tvfz dist/f3rva-api-${{ github.event.inputs.versionNumber }}.tar.gz
+    - uses: robinraju/release-downloader@v1.3
+      with:
+        tag: "${{ github.event.inputs.versionNumber }}"
+        fileName: "f3rva-api-${{ github.event.inputs.versionNumber }}.tar.gz"
+        out-file-path: "dist"
+        tarBall: true
+        zipBall: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: List the tar contents
+      id: tar-contents
+      run: |
+        tar tvfz dist/f3rva-api-${{ github.event.inputs.versionNumber }}.tar.gz
