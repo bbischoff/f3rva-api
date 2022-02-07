@@ -34,7 +34,12 @@ jobs:
       
       - name: Install composer dependencies
         run: composer install --prefer-dist
-        
+      
+      # ugly sed command but we need to replace the version number in the settings file prior to packaging
+      - name: Update version file
+        run: |
+          sed -e 's/const VERSION = '\''[^'\''][^'\'']*'\''/const VERSION = '\''${{ steps.vars.outputs.tag }}'\''/g' src/F3/Settings.php
+
       - name: Create distribution package
         id: create-distribution
         run: |
