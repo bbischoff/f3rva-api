@@ -13,8 +13,8 @@
 			<directory>./src</directory>
 		</include>
 		<report>
-			<html outputDirectory="./test-output/coverage" lowUpperBound="60" highLowerBound="90" showUncoveredFiles="true"/>
-			<text outputFile="php://stdout" lowUpperBound="60" highLowerBound="90" showUncoveredFiles="true"/>
+			<html outputDirectory="./test-output/coverage" lowUpperBound="60" highLowerBound="90" />
+			<text outputFile="php://stdout" showUncoveredFiles="true"/>
 		</report>
 	</coverage>
 	<logging>
