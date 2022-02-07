@@ -1,20 +1,15 @@
-name: F3RVA API CI
+name: Setup Composer
 
 on: 
-  - pull_request
-  - push
+  workflow_call:
 
 jobs:
 
-  # unit test configuration
-  build:
+  # validate and install composer
+  setup-composer:
+    name: Validate and install composer dependencies
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout from repo
-        uses: actions/checkout@v2
-
-#      - name: Validate composer.json and composer.lock
-#        uses: ./.github/workflows/setup-composer.yml
       - name: Validate composer.json and composer.lock
         run: composer validate --strict
         
@@ -29,9 +24,3 @@ jobs:
       
       - name: Install composer dependencies
         run: composer install --prefer-dist
-        
-      - name: Run unit tests
-        run: |
-          composer test
-        env:
-          XDEBUG_MODE: coverage
