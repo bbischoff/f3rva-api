@@ -38,7 +38,7 @@ jobs:
       # ugly sed command but we need to replace the version number in the settings file prior to packaging
       - name: Update version file
         run: |
-          sed -i '' -e 's/const VERSION = '\''[^'\''][^'\'']*'\''/const VERSION = '\''${{ steps.vars.outputs.tag }}'\''/g' src/F3/Settings.php
+          sed -i -e 's/const VERSION = '\''[^'\''][^'\'']*'\''/const VERSION = '\''${{ steps.vars.outputs.tag }}'\''/g' src/F3/Settings.php
 
       - name: Create distribution package
         id: create-distribution
