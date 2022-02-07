@@ -13,9 +13,12 @@ jobs:
       - name: Checkout from repo
         uses: actions/checkout@v2
 
-      - name: Validate composer.json and composer.lock
-        uses: ./.github/workflows/setup-composer.yml
-        
+  validate-composer:
+    uses: ./.github/workflows/setup-composer.yml
+
+  unit-test:
+    runs-on: ubuntu-latest
+    steps:      
       - name: Run unit tests
         run: |
           composer test
