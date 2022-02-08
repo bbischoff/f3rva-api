@@ -5,7 +5,7 @@ use DI\ContainerBuilder;
 
 class Settings {
 
-	const VERSION = 'v0.1.0-dev';
+	const VERSION = 'v0.2.0-LATEST';
 	
 	public static function getDIContainer() {
 		$environment = getenv('ENVIRONMENT');
