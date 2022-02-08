@@ -3,7 +3,7 @@
 ## Installation
 - Install PHP
 - Install Composer
-    composer update
+    composer install
 - Add the following to php.ini
 
         [xdebug]
@@ -14,7 +14,7 @@
 ## Commands
 
 ### Web Server
-    php -S localhost:8000 -t public
+    composer local
 
 ### Code Coverage
-    ./vendor/bin/phpunit --coverage-html html --coverage-filter src test
+    composer test

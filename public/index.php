@@ -1,5 +1,6 @@
 <?php
 
+use F3\Resource\VersionResource;
 use F3\Resource\WorkoutResource;
 use F3\Resource\WorkoutSourceResource;
 
@@ -23,6 +24,18 @@ $requestMethod = $_SERVER["REQUEST_METHOD"];
 
 // router for supported endpoints
 switch($uri[1]) {
+    case 'version': 
+        // delegate to the resource
+        $resource = $container->get(VersionResource::class);
+        $response = $resource->processRequest($requestMethod);
+
+        // set header and response body
+        header($response[VersionResource::HEADER_KEY]);
+        if ($response[VersionResource::BODY_KEY]) {
+            echo $response[VersionResource::BODY_KEY];
+        }
+        
+        break;
     case 'workout': 
         // delegate to the resource
         $resource = $container->get(WorkoutResource::class);
@@ -41,9 +54,9 @@ switch($uri[1]) {
         $response = $resource->processRequest($requestMethod);
 
         // set header and response body
-        header($response[WorkoutResource::HEADER_KEY]);
-        if ($response[WorkoutResource::BODY_KEY]) {
-            echo $response[WorkoutResource::BODY_KEY];
+        header($response[WorkoutSourceResource::HEADER_KEY]);
+        if ($response[WorkoutSourceResource::BODY_KEY]) {
+            echo $response[WorkoutSourceResource::BODY_KEY];
         }
 
         break;
