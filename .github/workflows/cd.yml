@@ -3,41 +3,60 @@ name: F3RVA API CD
 on: 
   workflow_dispatch:
     inputs:
-      releasePrefix:
-        description: 'Prefix for all release names'
-        required: true
-        default: 'release'
       versionNumber:
         description: 'Version to deploy'
         required: true
         default: 'vX.X.X'
+      environmentKey:
+        description: 'Environment'
+        required: true
+        default: 'dev'
 
 jobs:
 
-  # deploy
-  # - get the deployment file from the release
-  # - secure copy the file to the destination (stored in secrets)
-  # - delete the old
-  # - expand the file on the remote host (probably a deployment script)
-  # - done
-
   deploy:
     runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environmentKey }}
     steps:
-      - name: Setup environment
-        id: setup-environment
-        run: |
-          mkdir dist
-      
-      - name: Retrieve the deployment file from the release package
-        uses: dsaltares/fetch-gh-release-asset@master
-        with:
-          version: "${{ github.event.inputs.versionNumber }}"
-          file: "f3rva-api-${{ github.event.inputs.versionNumber }}.tar.gz"
-          target: "dist/f3rva-api-${{ github.event.inputs.versionNumber }}.tar.gz"
-          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: List the tar contents
-        id: tar-contents
-        run: |
-          tar tvfz dist/f3rva-api-${{ github.event.inputs.versionNumber }}.tar.gz
+    - name: Download
+      uses: robinraju/release-downloader@v1.3
+      with:
+        repository: "f3rva/f3rva-api"
+        latest: false
+        tag: "${{ github.event.inputs.versionNumber }}"
+        fileName: "f3rva-api-${{ github.event.inputs.versionNumber }}.tar.gz"
+        tarBall: false
+        zipBall: false
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Deploy
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.DEPLOY_HOST }}
+        username: ${{ secrets.DEPLOY_USERNAME }}
+        port: ${{ secrets.DEPLOY_PORT }}
+        key: ${{ secrets.DEPLOY_KEY }}
+        passphrase: ${{ secrets.DEPLOY_PASSPHRASE }}
+        source: "./f3rva-api-${{ github.event.inputs.versionNumber }}.tar.gz"
+        target: "./deploy"
+    
+    - name: Extract
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.DEPLOY_HOST }}
+        username: ${{ secrets.DEPLOY_USERNAME }}
+        port: ${{ secrets.DEPLOY_PORT }}
+        key: ${{ secrets.DEPLOY_KEY }}
+        passphrase: ${{ secrets.DEPLOY_PASSPHRASE }}
+        script: | 
+          rm -rf ./public_html/dev.bigdata.f3rva/*
+          cd ./public_html/dev.bigdata.f3rva
+          tar xvfz ../../deploy/f3rva-api-${{ github.event.inputs.versionNumber }}.tar.gz
+
+          # environment specific replacements
+          sed -i -e 's/@@ENVIRONMENT_KEY@@/${{ github.event.inputs.environmentKey }}/g' public/.htaccess
+          sed -i -e 's/@@DB_HOST@@/${{ secrets.DB_HOST }}/g' config/config-${{ github.event.inputs.environmentKey }}.php
+          sed -i -e 's/@@DB_NAME@@/${{ secrets.DB_NAME }}/g' config/config-${{ github.event.inputs.environmentKey }}.php
+          sed -i -e 's/@@DB_USER@@/${{ secrets.DB_USERNAME }}/g' config/config-${{ github.event.inputs.environmentKey }}.php
+          sed -i -e 's/@@DB_PASS@@/${{ secrets.DB_PASSWORD }}/g' config/config-${{ github.event.inputs.environmentKey }}.php
