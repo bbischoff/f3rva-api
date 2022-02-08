@@ -7,6 +7,10 @@ on:
         description: 'Version to deploy'
         required: true
         default: 'vX.X.X'
+      environmentKey:
+        description: 'Environment'
+        required: true
+        default: 'dev'
 
 jobs:
 
@@ -50,6 +54,8 @@ jobs:
         port: ${{ secrets.DEPLOY_PORT }}
         key: ${{ secrets.DEPLOY_KEY }}
         passphrase: ${{ secrets.DEPLOY_PASSPHRASE }}
-        script: |
+        script: | 
+          rm -rf ./public_html/dev.bigdata.f3rva/*
           cd ./public_html/dev.bigdata.f3rva
           tar xvfz ../../deploy/f3rva-api-${{ github.event.inputs.versionNumber }}.tar.gz
+          sed -i -e 's/@@ENVIRONMENT_KEY@@/${{ github.event.inputs.environmentKey }}/g' public/.htaccess
