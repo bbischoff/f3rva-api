@@ -55,7 +55,8 @@ class ChartDataTest extends TestCase {
             "1/2" => array (
                 "2021" => "9",
                 "2020" => "7"
-            )
+            ),
+            "1/3" => "11"
         );
         $model->setSeries($series);
         
@@ -64,7 +65,7 @@ class ChartDataTest extends TestCase {
             'series' => $series
         ]];
 
-        $this->assertEquals('[1/1,5,3],[1/2,9,7]', $model->getSeriesImploded(), 'series imploded mismatch');
+        $this->assertEquals('[1/1,5,3],[1/2,9,7],[1/3,11]', $model->getSeriesImploded(), 'series imploded mismatch');
     }
 
     public function testGetSeriesKeysImploded() {
