@@ -13,18 +13,13 @@ on:
         default: 'dev'
 
 jobs:
+  params:
+    uses: ./.github/workflows/properties-${{ github.event.inputs.environmentKey }}.yml
 
   deploy:
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environmentKey }}
     steps:
-    - name: Read YAML Data
-      uses: KJ002/read-yaml@1.5
-      id: deploy-path
-      with:
-        file: './properties/deploy-${{ github.event.inputs.environmentKey }}.yaml'
-        key-path: '["deploy", "path"]'
-
     - name: Download
       uses: robinraju/release-downloader@v1.3
       with:
@@ -59,7 +54,7 @@ jobs:
           #rm -rf ${{ steps.deploy-path.outputs.value }}/*
           #cd ${{ steps.deploy-path.outputs.value }}
           #tar xvfz ../../deploy/f3rva-api-${{ github.event.inputs.versionNumber }}.tar.gz
-          echo ${{ steps.deploy-path.outputs.value }}
+          echo ${{ needs.params.outputs.deployPath }}
 
           # environment specific replacements
           sed -i -e 's/@@ENVIRONMENT_KEY@@/${{ github.event.inputs.environmentKey }}/g' public/.htaccess
