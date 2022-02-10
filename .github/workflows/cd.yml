@@ -56,7 +56,7 @@ jobs:
 
           # environment specific replacements
           sed -i -e 's/@@ENVIRONMENT_KEY@@/${{ github.event.inputs.environmentKey }}/g' public/.htaccess
-          sed -i -e 's/@@DB_HOST@@/${{ secrets.DB_HOST }}/g' config/config-${{ github.event.inputs.environmentKey }}.php
-          sed -i -e 's/@@DB_NAME@@/${{ secrets.DB_NAME }}/g' config/config-${{ github.event.inputs.environmentKey }}.php
-          sed -i -e 's/@@DB_USER@@/${{ secrets.DB_USERNAME }}/g' config/config-${{ github.event.inputs.environmentKey }}.php
-          sed -i -e 's/@@DB_PASS@@/${{ secrets.DB_PASSWORD }}/g' config/config-${{ github.event.inputs.environmentKey }}.php
+          sed -i -e 's/@@DB_HOST@@/${{ secrets.DB_HOST }}/g' config/config-remote.php
+          sed -i -e 's/@@DB_NAME@@/${{ secrets.DB_NAME }}/g' config/config-remote.php
+          sed -i -e 's/@@DB_USER@@/${{ secrets.DB_USERNAME }}/g' config/config-remote.php
+          sed -i -e 's/@@DB_PASS@@/${{ secrets.DB_PASSWORD }}/g' config/config-remote.php
