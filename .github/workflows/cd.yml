@@ -14,7 +14,8 @@ on:
 
 jobs:
   params:
-    uses: ./.github/workflows/properties-${{ github.event.inputs.environmentKey }}.yml
+    if: ${{ github.event.inputs.environmentKey == 'dev' }}
+    uses: ./.github/workflows/properties-dev.yml
 
   deploy:
     runs-on: ubuntu-latest

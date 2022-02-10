@@ -1,0 +1,17 @@
+name: Prod Deployment Parameters
+
+on:
+  workflow_call:
+    # Map the workflow outputs to job outputs
+    outputs:
+      deployPath:
+        description: "The destination location to deploy the code"
+        value: "/home/brianbischoff/apps/bigdata.f3rva"
+
+jobs:
+  set-params:
+    name: Setting Deployment Parameters
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo
+        run: echo "Setting deployment parameters"
