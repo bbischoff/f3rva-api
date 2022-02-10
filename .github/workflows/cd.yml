@@ -50,8 +50,8 @@ jobs:
         key: ${{ secrets.DEPLOY_KEY }}
         passphrase: ${{ secrets.DEPLOY_PASSPHRASE }}
         script: | 
-          rm -rf ./public_html/dev.bigdata.f3rva/*
-          cd ./public_html/dev.bigdata.f3rva
+          rm -rf ${{ secrets.DEPLOY_PATH }}/*
+          cd ${{ secrets.DEPLOY_PATH }}
           tar xvfz ../../deploy/f3rva-api-${{ github.event.inputs.versionNumber }}.tar.gz
 
           # environment specific replacements
