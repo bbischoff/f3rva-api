@@ -13,10 +13,6 @@ on:
         default: 'dev'
 
 jobs:
-  params:
-    if: ${{ github.event.inputs.environmentKey == 'dev' }}
-    uses: ./.github/workflows/properties-dev.yml
-
   deploy:
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environmentKey }}
@@ -56,10 +52,10 @@ jobs:
         key: ${{ secrets.DEPLOY_KEY }}
         passphrase: ${{ secrets.DEPLOY_PASSPHRASE }}
         script: | 
-          #rm -rf ${{ steps.deploy-path.outputs.value }}/*
-          #cd ${{ steps.deploy-path.outputs.value }}
-          #tar xvfz ../../deploy/f3rva-api-${{ github.event.inputs.versionNumber }}.tar.gz
-          echo ${{ needs.params.outputs.deployPath }}
+          echo "DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}"
+          rm -rf ${{ secrets.DEPLOY_PATH }}/*
+          cd ${{ secrets.DEPLOY_PATH }}
+          tar xvfz ../../deploy/f3rva-api-${{ github.event.inputs.versionNumber }}.tar.gz
 
           # environment specific replacements
           sed -i -e 's/@@ENVIRONMENT_KEY@@/${{ github.event.inputs.environmentKey }}/g' public/.htaccess
