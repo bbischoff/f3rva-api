@@ -13,12 +13,11 @@ on:
         default: 'dev'
 
 jobs:
-
   deploy:
+    name: Deploy and Extract
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environmentKey }}
     steps:
-
     - name: Download
       uses: robinraju/release-downloader@v1.3
       with:
@@ -50,13 +49,14 @@ jobs:
         key: ${{ secrets.DEPLOY_KEY }}
         passphrase: ${{ secrets.DEPLOY_PASSPHRASE }}
         script: | 
-          rm -rf ./public_html/dev.bigdata.f3rva/*
-          cd ./public_html/dev.bigdata.f3rva
+          echo "DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}"
+          rm -rf ${{ secrets.DEPLOY_PATH }}/*
+          cd ${{ secrets.DEPLOY_PATH }}
           tar xvfz ../../deploy/f3rva-api-${{ github.event.inputs.versionNumber }}.tar.gz
 
           # environment specific replacements
           sed -i -e 's/@@ENVIRONMENT_KEY@@/${{ github.event.inputs.environmentKey }}/g' public/.htaccess
-          sed -i -e 's/@@DB_HOST@@/${{ secrets.DB_HOST }}/g' config/config-${{ github.event.inputs.environmentKey }}.php
-          sed -i -e 's/@@DB_NAME@@/${{ secrets.DB_NAME }}/g' config/config-${{ github.event.inputs.environmentKey }}.php
-          sed -i -e 's/@@DB_USER@@/${{ secrets.DB_USERNAME }}/g' config/config-${{ github.event.inputs.environmentKey }}.php
-          sed -i -e 's/@@DB_PASS@@/${{ secrets.DB_PASSWORD }}/g' config/config-${{ github.event.inputs.environmentKey }}.php
+          sed -i -e 's/@@DB_HOST@@/${{ secrets.DB_HOST }}/g' config/config-remote.php
+          sed -i -e 's/@@DB_NAME@@/${{ secrets.DB_NAME }}/g' config/config-remote.php
+          sed -i -e 's/@@DB_USER@@/${{ secrets.DB_USERNAME }}/g' config/config-remote.php
+          sed -i -e 's/@@DB_PASS@@/${{ secrets.DB_PASSWORD }}/g' config/config-remote.php
