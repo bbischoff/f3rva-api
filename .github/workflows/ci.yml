@@ -7,7 +7,8 @@ on:
 jobs:
 
   # unit test configuration
-  build:
+  unit-test:
+    name: Unit Tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout from repo

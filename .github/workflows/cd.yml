@@ -14,13 +14,10 @@ on:
 
 jobs:
   deploy:
+    name: Deploy and Extract
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.environmentKey }}
     steps:
-    - name: Echo
-      run: |
-        echo ${{ needs.params.outputs.deployPath }}
-
     - name: Download
       uses: robinraju/release-downloader@v1.3
       with:

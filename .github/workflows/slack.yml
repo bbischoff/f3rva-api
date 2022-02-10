@@ -8,6 +8,7 @@ jobs:
 
   # notify slack channel
   notify-slack:
+    name: Notify Slack
     runs-on: ubuntu-latest
     steps:
       - name: Post to Slack Channel
