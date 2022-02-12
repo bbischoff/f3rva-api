@@ -1,0 +1,16 @@
+openapi: '3.0.2'
+info:
+  title: Version
+  version: '1.0'
+servers:
+  - url: http://devbigdata.brianbischoff.com
+  - url: https://devbigdata.f3rva.org/api
+    description: Server description
+paths:
+  /version:
+    get:
+      responses:
+        '200':
+          description: OK
+        '405':
+          description: Method not allowed
