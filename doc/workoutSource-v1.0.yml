@@ -1,0 +1,94 @@
+openapi: '3.0.2'
+info:
+  title: Workout Source API
+  version: '1.0'
+servers:
+  - url: https://bigdata.f3rva.org
+    description: Primary production server
+  - url: http://devbigdata.brianbischoff.com
+    description: Development server
+paths:
+  /workoutSource:
+    get:
+      summary: Returns the metadata details about a backblast
+      parameters:
+        - in: query
+          name: url
+          schema: 
+            type: string
+          description: The full URL to the backblast to parse
+          required: true
+      
+      responses:
+        '200':
+          description: JSON payload with the information parsed from the backblast
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutSource'
+        '400':
+          description: Required parameters not provided
+        '405':
+          description: Requested method not allowed
+
+components:
+  schemas:
+    WorkoutSource:
+      type: object
+      properties:
+        author:
+          type: string
+          example: Splinter
+        date:
+          type: object
+          properties:
+            year: 
+              type: integer
+              example: 2022
+            month: 
+              type: integer
+              example: 12
+            day: 
+              type: integer
+              example: 23
+            hour: 
+              type: integer
+              example: 0
+            minute: 
+              type: integer
+              example: 0
+            second: 
+              type: integer
+              example: 0
+            fraction: 
+              type: integer
+              example: 0
+            warning_count: 
+              type: integer
+              example: 0 
+            warnings: 
+              type: array
+              example: []
+            error_count: 
+              type: integer
+              example: 0 
+            errors: 
+              type: array
+              example: []
+            is_localtime:
+              type: boolean
+              example: false
+        pax:
+          type: array
+          example: [ 'Wedding Singer', 'Bootleg' ]
+        q:
+          type: array
+          example: [ 'Splinter' ]
+        tags: 
+          type: array
+          example: [ 'Spider Run' ]
+        title: 
+          type: string
+          example: 'Mount Henrico'
+
+
