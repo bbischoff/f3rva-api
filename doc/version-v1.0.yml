@@ -3,14 +3,29 @@ info:
   title: Version
   version: '1.0'
 servers:
+  - url: https://bigdata.f3rva.org
   - url: http://devbigdata.brianbischoff.com
-  - url: https://devbigdata.f3rva.org/api
     description: Server description
 paths:
   /version:
     get:
+      summary: Returns the current version
       responses:
         '200':
-          description: OK
+          description: JSON payload with the version information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Version'
         '405':
-          description: Method not allowed
+          description: Requested method not allowed
+
+components:
+  schemas:
+    Version:
+      type: object
+      properties:
+        version:
+          type: string
+          example: v1.0.1
+
