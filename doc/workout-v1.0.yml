@@ -1,0 +1,277 @@
+openapi: '3.0.2'
+info:
+  title: Workout API
+  version: '1.0'
+
+servers:
+  - url: https://bigdata.f3rva.org
+    description: Primary production server
+  - url: http://devbigdata.brianbischoff.com
+    description: Development server
+  - url: http://localhost:8000
+    description: Local dev server
+
+paths:
+  /workout:
+    get:
+      summary: Returns an array of workouts that meet the parameters or the most recent 5 days of workouts
+      tags:
+        - Workout
+      parameters:
+        - in: query
+          name: startDate
+          schema:
+            type: string
+            example: '2022-03-11'
+          description: 'The date to begin the search'
+          required: false
+        - in: query
+          name: numberOfDays
+          schema:
+            type: integer
+            example: 3
+            default: 5
+          description: 'How many days worth of workouts to retrieve'
+          required: false
+        - in: query
+          name: ao
+          schema:
+            type: integer
+            example: 12
+          description: 'The ID of the AO to retrieve workouts'
+          required: false
+        - in: query
+          name: q
+          schema:
+            type: integer
+            example: 12
+          description: 'The ID of the Q to retrieve workouts'
+          required: false
+        - in: query
+          name: pax
+          schema:
+            type: integer
+            example: 12
+          description: 'The ID of the Pax Member to retrieve workouts'
+          required: false
+
+      responses:
+        '200':
+          description: JSON payload with the workouts that meet the requested criteria
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfWorkout'
+        '400':
+          description: Parameters do not meet specified format
+  
+    post:
+      summary:  Creates a new workout, pulling information from the source
+      tags:
+        - Workout
+      requestBody:
+        description: The request body defining workout source information
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                post:
+                  type: object
+                  properties:
+                    url:
+                      type: string
+                      example: 'https://f3rva.org/2022/01/04/average-age-is-respect/'
+      
+      responses:
+        '200':
+          description: The workout was created successfully.  The ID returned is the ID of the workout.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+
+        '400':
+          description: JSON body do not meet specified format
+
+    put:
+      summary:  Updates the most recent workouts from the source
+      tags:
+        - Workout
+      requestBody:
+        description: The request body to update the most recent workouts
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                numDays:
+                  type: integer
+                  example: 5
+      
+      responses:
+        '200':
+          description: The workout was updated successfully
+        '400':
+          description: JSON body do not meet specified format
+
+  /workout/{id}:
+    get:
+      summary: Returns the details about a specific workout
+      tags:
+        - Workout
+      parameters:
+        - in: path
+          name: id
+          schema: 
+            type: string
+          description: The workout ID
+          required: true
+      
+      responses:
+        '200':
+          description: JSON payload with the information parsed from the backblast
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workout'
+        '400':
+          description: Parameters do not meet specified format
+        '404':
+          description: Requested workout not found
+    
+    put:
+      summary:  Updates a workout with the latest information from the source
+      tags:
+        - Workout
+      parameters:
+        - in: path
+          name: id
+          schema: 
+            type: string
+          description: The workout ID
+          required: true
+      
+      responses:
+        '200':
+          description: The workout was updated successfully
+        '400':
+          description: Parameters do not meet specified format
+        '404':
+          description: Requested workout not found
+
+    delete:
+      summary:  Removes a workout from the system
+      tags:
+        - Workout
+      parameters:
+        - in: path
+          name: id
+          schema: 
+            type: string
+          description: The workout ID
+          required: true
+      
+      responses:
+        '200':
+          description: The workout was deleted successfully
+        '400':
+          description: Parameters do not meet specified format
+        '404':
+          description: Requested workout not found
+        '500':
+          description: There was an error and the workout was not deleted
+
+components:
+  schemas:
+    Workout:
+      type: object
+      properties:
+        id:
+          type: string
+          example: '6595'
+        backblastUrl: 
+          type: string
+          example: 'https://f3rva.org/2021/12/21/backblast-title/'
+        title:
+          type: string
+          example: 'Backblast Title'
+        ao:
+          $ref: '#/components/schemas/ArrayOfAO'
+        q:
+          $ref: '#/components/schemas/ArrayOfQ'
+        pax:
+          $ref: '#/components/schemas/ArrayOfPax'
+        paxCount:
+          type: integer
+          format: int64
+          example: 9
+        workoutDate:
+          type: string
+          example: '2022-03-11'
+    
+    AO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 12
+        description:
+          type: string
+          example: 'AO description'
+
+    Member:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 12
+        f3Name:
+          type: string
+          example: 'Saab'
+        aliases:
+          type: array
+          items:
+            type: string
+            example: ['The Dude', 'Alias 2']
+
+    Response:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 12
+        code:
+          type: integer
+          enum: [0, 1, 2, 3, 4]
+        message:
+          type: string
+
+    ArrayOfAO:
+      type: array
+      items:
+        type: object
+        $ref: '#/components/schemas/AO'
+    
+    ArrayOfQ:
+      type: array
+      items:
+        type: object
+        $ref: '#/components/schemas/Member'
+
+    ArrayOfPax:
+      type: array
+      items:
+        type: object
+        $ref: '#/components/schemas/Member'
+
+    ArrayOfWorkout:
+      type: array
+      items:
+        type: object
+        $ref: '#/components/schemas/Workout'
