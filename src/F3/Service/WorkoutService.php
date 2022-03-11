@@ -160,18 +160,19 @@ class WorkoutService {
 				$db->beginTransaction();
 				
 				// insert the workout
-				$response->setId($this->workoutRepo->save($additionalInfo->title, $additionalInfo->date, $data->post->url));
+				$id = $this->workoutRepo->save($additionalInfo->title, $additionalInfo->date, $data->post->url);
 				
 				// add the aos
-				$this->saveWorkoutAos($response->getId(), $additionalInfo->tags);
+				$this->saveWorkoutAos($id, $additionalInfo->tags);
 				
 				// add the qs
-				$this->saveWorkoutQs($response->getId(), $additionalInfo->q);
+				$this->saveWorkoutQs($id, $additionalInfo->q);
 				
 				// add the pax members
-				$this->saveWorkoutMembers($response->getId(), $additionalInfo->pax);
+				$this->saveWorkoutMembers($id, $additionalInfo->pax);
 				
 				$db->commit();
+				$response->setId($id);
 				$response->setCode(Response::SUCCESS);
 			}
 			catch (\Exception $e) {
