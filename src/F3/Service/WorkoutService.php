@@ -2,6 +2,7 @@
 namespace F3\Service;
 
 use F3\Dao\ScraperDao;
+use F3\Model\AO;
 use F3\Model\Member;
 use F3\Model\Response;
 use F3\Model\Workout;
@@ -52,7 +53,7 @@ class WorkoutService {
 					$member->setF3Name($pax["F3_NAME"]);
 					$paxArray[$member->getMemberId()] = $member;
 				}
-				$workoutObj->setPax($paxArray);
+				$workoutObj->setPax(array_values($paxArray));
 			}
 			else {
 				// we already have the workout details, just add the duplicate info
@@ -60,7 +61,13 @@ class WorkoutService {
 				$workoutObj = $this->addQToWorkout($workoutObj, $workout['Q_ID'], $workout['Q']);
 			}
 		}
-				
+		
+		// only add the values to the retun array so we don't get the keys cluttering JSON
+		if ($workoutObj != null) {
+			$workoutObj->setAo(array_values($workoutObj->getAo()));
+			$workoutObj->setQ(array_values($workoutObj->getQ()));
+		}
+
 		return $workoutObj;
 	}
 
@@ -330,6 +337,9 @@ class WorkoutService {
 			}
 		}
 		
+		// flatten the array to only include the values, no keys
+		$workoutsArray = array_values($workoutsArray);
+
 		return $workoutsArray;
 	}
 	private function createWorkoutObj($workout) {
@@ -338,14 +348,20 @@ class WorkoutService {
 		$aoArray = array();
 		// only add the AO if it exists
 		if (!is_null($workout['AO_ID'])) {
-			$aoArray[$workout['AO_ID']] = $workout['AO'];
+			$ao = new AO();
+			$ao->setId($workout['AO_ID']);
+			$ao->setDescription($workout['AO']);
+			$aoArray[$workout['AO_ID']] = $ao;
 		}
 		$workoutObj->setAo($aoArray);
 		
 		$qArray = array();
 		// only add the Q if it exists
 		if (!is_null($workout['Q_ID'])) {
-			$qArray[$workout['Q_ID']] = $workout['Q'];
+			$q = new Member();
+			$q->setMemberId($workout['Q_ID']);
+			$q->setF3Name($workout['Q']);
+			$qArray[$workout['Q_ID']] = $q;
 		}
 		$workoutObj->setQ($qArray);
 		
@@ -362,7 +378,10 @@ class WorkoutService {
 		$aoArray = $workout->getAo();
 		
 		if (!array_key_exists($aoId, $aoArray)) {
-			$aoArray[$aoId] = $aoDescription;
+			$ao = new AO();
+			$ao->setId($aoId);
+			$ao->setDescription($aoDescription);
+			$aoArray[$aoId] = $ao;
 			$workout->setAo($aoArray);
 		}
 		
@@ -372,7 +391,10 @@ class WorkoutService {
 	private function addQToWorkout($workout, $qId, $qName) {
 		$qArray = $workout->getQ();
 		if (!array_key_exists($qId, $qArray)) {
-			$qArray[$qId] = $qName;
+			$q = new Member();
+			$q->setMemberId($qId);
+			$q->setF3Name($qName);
+			$qArray[$qId] = $q;
 			$workout->setQ($qArray);
 		}
 		

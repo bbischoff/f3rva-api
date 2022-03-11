@@ -80,12 +80,12 @@ class WorkoutServiceTest extends TestCase {
         $this->assertEquals('5', $result->getPaxCount(), 'pax count mismatch');
         $this->assertEquals('Test Post', $result->getTitle(), 'title mismatch');
         $this->assertEquals('2021-12-30', $result->getWorkoutDate(), 'date mismatch');
-        $this->assertEquals('Spider Run', $result->getAo()['2'], 'ao mismatch');
-        $this->assertEquals('Hoedown', $result->getAo()['6'], 'ao2 mismatch');
-        $this->assertEquals('Splinter', $result->getQ()['3'], 'q mismatch');
-        $this->assertEquals('Lockjaw', $result->getQ()['7'], 'q2 mismatch');
-        $this->assertEquals('4', $result->getPax()['4']->getMemberId(), 'pax member id mismatch');
-        $this->assertEquals('Upchuck', $result->getPax()['4']->getF3Name(), 'pax name mismatch');
+        $this->assertEquals('Spider Run', $result->getAo()[0]->getDescription(), 'ao mismatch');
+        $this->assertEquals('Hoedown', $result->getAo()[1]->getDescription(), 'ao2 mismatch');
+        $this->assertEquals('Splinter', $result->getQ()[0]->getF3Name(), 'q mismatch');
+        $this->assertEquals('Lockjaw', $result->getQ()[1]->getF3Name(), 'q2 mismatch');
+        $this->assertEquals('4', $result->getPax()[0]->getMemberId(), 'pax member id mismatch');
+        $this->assertEquals('Upchuck', $result->getPax()[0]->getF3Name(), 'pax name mismatch');
     }
 
     public function testGetWorkouts() {
@@ -107,16 +107,17 @@ class WorkoutServiceTest extends TestCase {
 
         $workoutService = new WorkoutService($this->memberService, $this->scraperDao, $this->workoutRepo, $this->database);
         $result = $workoutService->getWorkouts();
+        $firstResult = array_values($result)[0];
 
-        $this->assertEquals('1', $result['1']->getWorkoutId(), 'workout id mismatch');
-        $this->assertEquals('https://f3rva.org/2021/12/30/test-post', $result['1']->getBackblastURL(), 'url mismatch');
-        $this->assertEquals('5', $result['1']->getPaxCount(), 'pax count mismatch');
-        $this->assertEquals('Test Post', $result['1']->getTitle(), 'title mismatch');
-        $this->assertEquals('2021-12-30', $result['1']->getWorkoutDate(), 'date mismatch');
-        $this->assertEquals('Spider Run', $result['1']->getAo()['2'], 'ao mismatch');
-        $this->assertEquals('Hoedown', $result['1']->getAo()['6'], 'ao2 mismatch');
-        $this->assertEquals('Splinter', $result['1']->getQ()['3'], 'q mismatch');
-        $this->assertEquals('Lockjaw', $result['1']->getQ()['7'], 'q2 mismatch');
+        $this->assertEquals('1', $firstResult->getWorkoutId(), 'workout id mismatch');
+        $this->assertEquals('https://f3rva.org/2021/12/30/test-post', $firstResult->getBackblastURL(), 'url mismatch');
+        $this->assertEquals('5', $firstResult->getPaxCount(), 'pax count mismatch');
+        $this->assertEquals('Test Post', $firstResult->getTitle(), 'title mismatch');
+        $this->assertEquals('2021-12-30', $firstResult->getWorkoutDate(), 'date mismatch');
+        $this->assertEquals('Spider Run', array_values($firstResult->getAo())[0]->getDescription(), 'ao mismatch');
+        $this->assertEquals('Hoedown', array_values($firstResult->getAo())[1]->getDescription(), 'ao2 mismatch');
+        $this->assertEquals('Splinter', array_values($firstResult->getQ())[0]->getF3Name(), 'q mismatch');
+        $this->assertEquals('Lockjaw', array_values($firstResult->getQ())[1]->getF3Name(), 'q2 mismatch');
     }
 
     public function testGetWorkoutsByAo() {
@@ -127,9 +128,10 @@ class WorkoutServiceTest extends TestCase {
 
         $workoutService = new WorkoutService($this->memberService, $this->scraperDao, $this->workoutRepo, $this->database);
         $result = $workoutService->getWorkoutsByAo('5');
+        $firstResult = array_values($result)[0];
 
-        $this->assertEquals('1', $result['1']->getWorkoutId(), 'workout id mismatch');
-        $this->assertEquals('https://f3rva.org/2021/12/30/test-post', $result['1']->getBackblastURL(), 'url mismatch');
+        $this->assertEquals('1', $firstResult->getWorkoutId(), 'workout id mismatch');
+        $this->assertEquals('https://f3rva.org/2021/12/30/test-post', $firstResult->getBackblastURL(), 'url mismatch');
     }
 
     public function testGetWorkoutsByQ() {
@@ -140,9 +142,10 @@ class WorkoutServiceTest extends TestCase {
 
         $workoutService = new WorkoutService($this->memberService, $this->scraperDao, $this->workoutRepo, $this->database);
         $result = $workoutService->getWorkoutsByQ('5');
+        $firstResult = array_values($result)[0];
 
-        $this->assertEquals('1', $result['1']->getWorkoutId(), 'workout id mismatch');
-        $this->assertEquals('https://f3rva.org/2021/12/30/test-post', $result['1']->getBackblastURL(), 'url mismatch');
+        $this->assertEquals('1', $firstResult->getWorkoutId(), 'workout id mismatch');
+        $this->assertEquals('https://f3rva.org/2021/12/30/test-post', $firstResult->getBackblastURL(), 'url mismatch');
     }
 
     public function testGetWorkoutsByPax() {
@@ -153,9 +156,10 @@ class WorkoutServiceTest extends TestCase {
 
         $workoutService = new WorkoutService($this->memberService, $this->scraperDao, $this->workoutRepo, $this->database);
         $result = $workoutService->getWorkoutsByPax('5');
+        $firstResult = array_values($result)[0];
 
-        $this->assertEquals('1', $result['1']->getWorkoutId(), 'workout id mismatch');
-        $this->assertEquals('https://f3rva.org/2021/12/30/test-post', $result['1']->getBackblastURL(), 'url mismatch');
+        $this->assertEquals('1', $firstResult->getWorkoutId(), 'workout id mismatch');
+        $this->assertEquals('https://f3rva.org/2021/12/30/test-post', $firstResult->getBackblastURL(), 'url mismatch');
     }
 
     public function testParsePost() {
