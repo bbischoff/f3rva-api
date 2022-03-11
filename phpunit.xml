@@ -14,7 +14,7 @@
 		</include>
 		<report>
 			<html outputDirectory="./test-output/coverage" lowUpperBound="60" highLowerBound="90" />
-			<text outputFile="php://stdout" showUncoveredFiles="true"/>
+			<text outputFile="php://stdout" showUncoveredFiles="true" />
 		</report>
 	</coverage>
 	<logging>
