@@ -57,11 +57,9 @@ class DayOfWeek implements \JsonSerializable {
 	public function jsonSerialize()
 	{
 		return [
-			'dayOfWeek' => [
-				'id' => $this->getDayId(),
-				'description' => $this->getDayText(),
-				'count' => $this->getCount()
-			]
+			'id' => $this->getDayId(),
+			'description' => $this->getDayText(),
+			'count' => $this->getCount()
 		];
 	}
 }

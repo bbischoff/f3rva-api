@@ -33,11 +33,9 @@ class Summary implements \JsonSerializable {
 	public function jsonSerialize()
 	{
 		return [
-			'summary' => [
-				'id' => $this->getId(),
-				'description' => $this->getDescription(),
-				'value' => $this->getValue()
-			]
+			'id' => $this->getId(),
+			'description' => $this->getDescription(),
+			'value' => $this->getValue()
 		];
 	}
 }

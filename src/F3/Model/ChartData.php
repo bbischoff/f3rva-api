@@ -47,10 +47,8 @@ class ChartData implements \JsonSerializable {
 	public function jsonSerialize()
 	{
 		return [
-			'chartData' => [
-				'xLabels' => $this->getXLabels(),
-				'series' => $this->getSeries()
-			]
+			'xLabels' => $this->getXLabels(),
+			'series' => $this->getSeries()
 		];
 	}
 }

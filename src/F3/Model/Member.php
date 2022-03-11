@@ -33,11 +33,9 @@ class Member implements \JsonSerializable {
 	public function jsonSerialize()
 	{
 		return [
-			'member' => [
-				'id' => $this->getMemberId(),
-				'f3Name' => $this->getF3Name(),
-				'aliases' => $this->getAliases()
-			]
+			'id' => $this->getMemberId(),
+			'f3Name' => $this->getF3Name(),
+			'aliases' => $this->getAliases()
 		];
 	}
 }

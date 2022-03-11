@@ -48,12 +48,10 @@ class Response implements \JsonSerializable {
 	public function jsonSerialize()
 	{
 		return [
-			'response' => [
-				'code' => $this->getCode(),
-				'id' => $this->getId(),
-				'message' => $this->getMessage(),
-				'results' => $this->getResults()
-			]
+			'code' => $this->getCode(),
+			'id' => $this->getId(),
+			'message' => $this->getMessage(),
+			'results' => $this->getResults()
 		];
 	}
 }

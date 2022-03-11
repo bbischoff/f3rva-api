@@ -78,16 +78,14 @@ class Workout implements \JsonSerializable {
 	public function jsonSerialize()
 	{
 		return [
-			'workout' => [
-				'id' => $this->getWorkoutId(),
-				'backblastUrl' => $this->getBackblastUrl(),
-				'title' => $this->getTitle(),
-				'ao' => $this->getAo(),
-				'q' => $this->getQ(),
-				'pax' => $this->getPax(),
-				'paxCount' => $this->getPaxCount(),
-				'workoutDate' => $this->getWorkoutDate()
-			]
+			'id' => $this->getWorkoutId(),
+			'backblastUrl' => $this->getBackblastUrl(),
+			'title' => $this->getTitle(),
+			'ao' => $this->getAo(),
+			'q' => $this->getQ(),
+			'pax' => $this->getPax(),
+			'paxCount' => $this->getPaxCount(),
+			'workoutDate' => $this->getWorkoutDate()
 		];
 	}
 }

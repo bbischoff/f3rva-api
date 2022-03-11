@@ -51,13 +51,11 @@ class MemberStats implements \JsonSerializable {
 	public function jsonSerialize()
 	{
 		return [
-			'memberStats' => [
-				'id' => $this->getMemberId(),
-				'name' => $this->getMemberName(),
-				'numWorkouts' => $this->getNumWorkouts(),
-				'numQs' => $this->getNumQs(),
-				'qRatio' => $this->getQRatio()
-			]
+			'id' => $this->getMemberId(),
+			'name' => $this->getMemberName(),
+			'numWorkouts' => $this->getNumWorkouts(),
+			'numQs' => $this->getNumQs(),
+			'qRatio' => $this->getQRatio()
 		];
 	}
 }

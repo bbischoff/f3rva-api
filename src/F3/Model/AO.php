@@ -24,10 +24,8 @@ class AO implements \JsonSerializable {
 	public function jsonSerialize()
 	{
 		return [
-			'ao' => [
-				'id' => $this->getId(),
-				'description' => $this->getDescription()
-			]
+            'id' => $this->getId(),
+            'description' => $this->getDescription()
 		];
 	}
 }
