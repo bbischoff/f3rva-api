@@ -21,13 +21,13 @@ class MemberStatsTest extends TestCase {
         $model->setNumQs(26);
         $model->setQRatio('31.0%');
         
-        $expected = [ 'memberStats' => [
+        $expected = [
             'id' => 1,
             'name' => 'Splinter',
             'numWorkouts' => 84,
             'numQs' => 26,
             'qRatio' => '31.0%'
-        ]];
+        ];
 
         $this->assertEquals($expected, $model->jsonSerialize(), 'json mismatch');
     }

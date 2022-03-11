@@ -19,11 +19,11 @@ class MemberTest extends TestCase {
         $model->setF3Name('Splinter');
         $model->setAliases('Splendid Splinter');
         
-        $expected = [ 'member' => [
+        $expected = [ 
             'id' => 1,
             'f3Name' => 'Splinter',
             'aliases' => 'Splendid Splinter'
-        ]];
+        ];
 
         $this->assertEquals($expected, $model->jsonSerialize(), 'json mismatch');
     }

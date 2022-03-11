@@ -18,11 +18,11 @@ class DayOfWeekTest extends TestCase {
         $model->setDayId(1);
         $model->setCount(12);
         
-        $expected = [ 'dayOfWeek' => [
+        $expected = [
             'id' => 1,
             'description' => 'Sunday',
             'count' => 12
-        ]];
+        ];
 
         $this->assertEquals($expected, $model->jsonSerialize(), 'json mismatch');
     }

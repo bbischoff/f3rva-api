@@ -24,7 +24,7 @@ class WorkoutTest extends TestCase {
         $model->setPaxCount('count');
         $model->setWorkoutDate('date');
         
-        $expected = [ 'workout' => [
+        $expected = [
             'id' => 1,
             'backblastUrl' => 'url',
             'title' => 'title',
@@ -33,7 +33,7 @@ class WorkoutTest extends TestCase {
             'pax' => 'pax',
             'paxCount' => 'count',
             'workoutDate' => 'date'
-        ]];
+        ];
 
         $this->assertEquals($expected, $model->jsonSerialize(), 'json mismatch');
     }

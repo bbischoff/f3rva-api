@@ -20,12 +20,12 @@ class ResponseTest extends TestCase {
         $model->setMessage('message');
         $model->setResults('results');
         
-        $expected = [ 'response' => [
+        $expected = [
             'id' => 1,
             'code' => Response::SUCCESS,
             'message' => 'message',
             'results' => 'results'
-        ]];
+        ];
 
         $this->assertEquals($expected, $model->jsonSerialize(), 'json mismatch');
     }

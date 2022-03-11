@@ -19,11 +19,11 @@ class SummaryTest extends TestCase {
         $model->setDescription('description');
         $model->setValue('value');
         
-        $expected = [ 'summary' => [
+        $expected = [
             'id' => 1,
             'description' => 'description',
             'value' => 'value'
-        ]];
+        ];
 
         $this->assertEquals($expected, $model->jsonSerialize(), 'json mismatch');
     }

@@ -32,10 +32,10 @@ class ChartDataTest extends TestCase {
         );
         $model->setSeries($series);
         
-        $expected = [ 'chartData' => [
+        $expected = [
             'xLabels' => $labels,
             'series' => $series
-        ]];
+        ];
 
         $this->assertEquals($expected, $model->jsonSerialize(), 'json mismatch');
     }
@@ -60,10 +60,10 @@ class ChartDataTest extends TestCase {
         );
         $model->setSeries($series);
         
-        $expected = [ 'chartData' => [
+        $expected = [
             'xLabels' => $labels,
             'series' => $series
-        ]];
+        ];
 
         $this->assertEquals('[1/1,5,3],[1/2,9,7],[1/3,11]', $model->getSeriesImploded(), 'series imploded mismatch');
     }
@@ -87,10 +87,10 @@ class ChartDataTest extends TestCase {
         );
         $model->setSeries($series);
         
-        $expected = [ 'chartData' => [
+        $expected = [
             'xLabels' => $labels,
             'series' => $series
-        ]];
+        ];
 
         $this->assertEquals("'1/1','1/2'", $model->getSeriesKeysImploded(), 'series keys imploded mismatch');
     }

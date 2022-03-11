@@ -18,10 +18,10 @@ class AOTest extends TestCase {
         $model->setId('1');
         $model->setDescription('ao description');
         
-        $expected = [ 'ao' => [
+        $expected = [
             'id' => '1',
             'description' => 'ao description'
-        ]];
+        ];
 
         $this->assertEquals($expected, $model->jsonSerialize(), 'json mismatch');
     }
