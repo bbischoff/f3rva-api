@@ -1,7 +1,7 @@
 <?php
 namespace F3\Repo;
 
-use F3\Settings;
+use DI\Attribute\Inject;
 use PDO;
 
 /**
@@ -11,10 +11,7 @@ class SQLiteDatabase implements Database
 {
     private $_db;
 
-    /**
-     * @Inject({"localDbPath" = "db.local.path"})
-     */
-    public function __construct($localDbPath) {
+    public function __construct(#[Inject("db.local.path")] $localDbPath) {
         $dsn = "sqlite:" . $localDbPath;
     
         $this->_db = new PDO($dsn);

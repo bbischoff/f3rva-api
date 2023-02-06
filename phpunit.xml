@@ -1,8 +1,10 @@
 <?xml version="1.0"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" colors="true" testdox="true" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+colors="true" testdox="true" failOnRisky="true"
+xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.0/phpunit.xsd">
 	<php>
-        <env name="ENVIRONMENT" value="unit-test" force="true" />
-    </php>
+    <env name="ENVIRONMENT" value="unit-test" force="true" />
+  </php>
 	<testsuites>
 		<testsuite name="main">
 			<directory>test</directory>

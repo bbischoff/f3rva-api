@@ -14,7 +14,7 @@ class Settings {
 		$containerBuilder = new ContainerBuilder();
 		$containerBuilder->addDefinitions(dirname(__DIR__) . '/../config/config.php');
 		$containerBuilder->addDefinitions(dirname(__DIR__) . '/../config/config-' . $environment . '.php');
-		$containerBuilder->useAnnotations(true);
+		$containerBuilder->useAttributes(true);
 		$container = $containerBuilder->build();
 
 		return $container;
