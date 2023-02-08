@@ -16,16 +16,20 @@ class MemberTest extends TestCase {
     public function testJsonSerialize() {
         $model = new Member();
         $model->setMemberId(1);
-        $model->setF3Name('Splinter');
-        $model->setAliases('Splendid Splinter');
+        $model->setF3Name("Splinter");
+        $model->setAliases(array(
+            "Splendid Splinter" => "Splendid Splinter"
+        ));
         
-        $expected = [ 'member' => [
-            'id' => 1,
-            'f3Name' => 'Splinter',
-            'aliases' => 'Splendid Splinter'
+        $expected = [ "member" => [
+            "id" => 1,
+            "f3Name" => "Splinter",
+            "aliases" => array(
+                "Splendid Splinter" => "Splendid Splinter"
+            )
         ]];
 
-        $this->assertEquals($expected, $model->jsonSerialize(), 'json mismatch');
+        $this->assertEquals($expected, $model->jsonSerialize(), "json mismatch");
     }
 }
 ?>

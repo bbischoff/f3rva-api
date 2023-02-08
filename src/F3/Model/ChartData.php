@@ -44,7 +44,7 @@ class ChartData implements \JsonSerializable {
 		$this->series = $series;
 	}
 
-	public function jsonSerialize()
+	public function jsonSerialize(): array
 	{
 		return [
 			'chartData' => [

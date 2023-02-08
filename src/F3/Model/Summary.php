@@ -30,7 +30,7 @@ class Summary implements \JsonSerializable {
 		$this->value = $value;
 	}
 
-	public function jsonSerialize()
+	public function jsonSerialize(): array
 	{
 		return [
 			'summary' => [

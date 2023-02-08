@@ -5,23 +5,23 @@ class AO implements \JsonSerializable {
 	private $id = null;
 	private $description = null;
 	
-	public function getId() {
+	public function getId(): string {
 		return $this->id;
 	}
 	
-	public function setId($id) {
+	public function setId($id): void {
 		$this->id = $id;
 	}
 	
-	public function getDescription() {
+	public function getDescription(): string {
 		return $this->description;
 	}
 	
-	public function setDescription($description) {
+	public function setDescription($description): void {
 		$this->description = $description;
 	}
 
-	public function jsonSerialize()
+	public function jsonSerialize(): array
 	{
 		return [
 			'ao' => [

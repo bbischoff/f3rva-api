@@ -48,7 +48,7 @@ class MemberStats implements \JsonSerializable {
 		$this->qRatio = $qRatio;
 	}
 
-	public function jsonSerialize()
+	public function jsonSerialize(): array
 	{
 		return [
 			'memberStats' => [

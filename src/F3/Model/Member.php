@@ -6,31 +6,31 @@ class Member implements \JsonSerializable {
 	private $f3Name = null;
 	private $aliases = null;
 	
-	public function getMemberId() {
+	public function getMemberId(): string {
 		return $this->memberId;
 	}
 	
-	public function setMemberId($memberId) {
+	public function setMemberId($memberId): void {
 		$this->memberId = $memberId;
 	}
 	
-	public function getF3Name() {
+	public function getF3Name(): string {
 		return $this->f3Name;
 	}
 	
-	public function setF3Name($f3Name) {
+	public function setF3Name($f3Name): void {
 		$this->f3Name = $f3Name;
 	}
 	
-	public function getAliases() {
+	public function getAliases(): ?array {
 		return $this->aliases;
 	}
 	
-	public function setAliases($aliases) {
+	public function setAliases($aliases): void {
 		$this->aliases = $aliases;
 	}
 
-	public function jsonSerialize()
+	public function jsonSerialize(): array
 	{
 		return [
 			'member' => [

@@ -54,7 +54,7 @@ class DayOfWeek implements \JsonSerializable {
 		return $dayText;
 	}
 
-	public function jsonSerialize()
+	public function jsonSerialize(): array
 	{
 		return [
 			'dayOfWeek' => [

@@ -12,7 +12,7 @@ class Version implements \JsonSerializable {
 		$this->version = $version;
 	}
 
-	public function jsonSerialize()
+	public function jsonSerialize(): array
 	{
 		return [
 			'version' => $this->getVersion()

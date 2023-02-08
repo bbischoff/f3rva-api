@@ -1,6 +1,7 @@
 <?php
 namespace F3\Resource;
 
+use F3\Model\Member;
 use F3\Model\Response;
 use PHPUnit\Framework\TestCase;
 use F3\Model\Workout;
@@ -40,8 +41,18 @@ class WorkoutResourceTest extends TestCase {
         // create mocked response
         /** @var \F3\Model\Workout $workout */
         $workout = new Workout();
-		$workout->setWorkoutId('123');
+        $workout->setAo(array("1" => "Spider Run"));
+        $workout->setBackblastUrl('http://someurl');
+        $member = new Member();
+        $member->setMemberId("1");
+        $member->setF3Name("Splinter");
+        $member->setAliases(null);
+        $workout->setPax(array("1" => $member));
+        $workout->setPaxCount("1");
+        $workout->setQ(array("1" => "Splinter"));
         $workout->setTitle('Best Backblast Ever');
+        $workout->setWorkoutDate("2023-02-06");
+		$workout->setWorkoutId('123');
 
         $this->workoutServiceMock->method('getWorkout')
                                  ->willReturn($workout);
@@ -82,8 +93,18 @@ class WorkoutResourceTest extends TestCase {
         // create mocked response
         /** @var \F3\Model\Workout $workout */
         $workout = new Workout();
-		$workout->setWorkoutId('123');
+        $workout->setAo(array("1" => "Spider Run"));
+        $workout->setBackblastUrl('http://someurl');
+        $member = new Member();
+        $member->setMemberId("1");
+        $member->setF3Name("Splinter");
+        $member->setAliases(null);
+        $workout->setPax(array("1" => $member));
+        $workout->setPaxCount("1");
+        $workout->setQ(array("1" => "Splinter"));
         $workout->setTitle('Best Backblast Ever');
+        $workout->setWorkoutDate("2023-02-06");
+		$workout->setWorkoutId('123');
         $workoutArray = array();
         $workoutArray['123'] = $workout;
 
@@ -111,8 +132,18 @@ class WorkoutResourceTest extends TestCase {
         // create mocked response
         /** @var \F3\Model\Workout $workout */
         $workout = new Workout();
-		$workout->setWorkoutId('123');
+        $workout->setAo(array("1" => "Spider Run"));
+        $workout->setBackblastUrl('http://someurl');
+        $member = new Member();
+        $member->setMemberId("1");
+        $member->setF3Name("Splinter");
+        $member->setAliases(null);
+        $workout->setPax(array("1" => $member));
+        $workout->setPaxCount("1");
+        $workout->setQ(array("1" => "Splinter"));
         $workout->setTitle('get by ao');
+        $workout->setWorkoutDate("2023-02-06");
+		$workout->setWorkoutId('123');
         $workoutArray = array();
         $workoutArray['123'] = $workout;
 
@@ -142,8 +173,18 @@ class WorkoutResourceTest extends TestCase {
         // create mocked response
         /** @var \F3\Model\Workout $workout */
         $workout = new Workout();
-		$workout->setWorkoutId('123');
+        $workout->setAo(array("1" => "Spider Run"));
+        $workout->setBackblastUrl('http://someurl');
+        $member = new Member();
+        $member->setMemberId("1");
+        $member->setF3Name("Splinter");
+        $member->setAliases(null);
+        $workout->setPax(array("1" => $member));
+        $workout->setPaxCount("1");
+        $workout->setQ(array("1" => "Splinter"));
         $workout->setTitle('get by ao');
+        $workout->setWorkoutDate("2023-02-06");
+		$workout->setWorkoutId('123');
         $workoutArray = array();
         $workoutArray['123'] = $workout;
 
@@ -173,8 +214,18 @@ class WorkoutResourceTest extends TestCase {
         // create mocked response
         /** @var \F3\Model\Workout $workout */
         $workout = new Workout();
-		$workout->setWorkoutId('123');
+        $workout->setAo(array("1" => "Spider Run"));
+        $workout->setBackblastUrl('http://someurl');
+        $member = new Member();
+        $member->setMemberId("1");
+        $member->setF3Name("Splinter");
+        $member->setAliases(null);
+        $workout->setPax(array("1" => $member));
+        $workout->setPaxCount("1");
+        $workout->setQ(array("1" => "Splinter"));
         $workout->setTitle('get by ao');
+        $workout->setWorkoutDate("2023-02-06");
+		$workout->setWorkoutId('123');
         $workoutArray = array();
         $workoutArray['123'] = $workout;
 
@@ -237,7 +288,7 @@ class WorkoutResourceTest extends TestCase {
 
     public function testProcessRequestPostWorkoutNoBody() {
         $this->dataRetrieverMock->method('retrieve')
-                                ->willReturn(null);
+                                ->willReturn('');
         
         $workoutResource = new WorkoutResource($this->workoutService, $this->dataRetriever);
         $result = $workoutResource->processRequest(RequestMethod::POST);
@@ -350,6 +401,8 @@ class WorkoutResourceTest extends TestCase {
     }
 
     public function testProcessRequestsPutWorkoutNullNumDaysBadRequest() {
+        $this->dataRetrieverMock->method('retrieve')
+                                ->willReturn('');
         $workoutResource = new WorkoutResource($this->workoutService, $this->dataRetriever);
         $result = $workoutResource->processRequest(RequestMethod::PUT);
         
@@ -371,8 +424,18 @@ class WorkoutResourceTest extends TestCase {
         // create mocked response
         /** @var \F3\Model\Workout $workout */
         $workout = new Workout();
-		$workout->setWorkoutId('123');
+        $workout->setAo(array("1" => "Spider Run"));
+        $workout->setBackblastUrl('http://someurl');
+        $member = new Member();
+        $member->setMemberId("1");
+        $member->setF3Name("Splinter");
+        $member->setAliases(null);
+        $workout->setPax(array("1" => $member));
+        $workout->setPaxCount("1");
+        $workout->setQ(array("1" => "Splinter"));
         $workout->setTitle('To be deleted');
+        $workout->setWorkoutDate("2023-02-06");
+		$workout->setWorkoutId('123');
 
         $this->workoutServiceMock->method('getWorkout')
                                  ->willReturn($workout);
@@ -420,8 +483,18 @@ class WorkoutResourceTest extends TestCase {
         // create mocked response
         /** @var \F3\Model\Workout $workout */
         $workout = new Workout();
-		$workout->setWorkoutId('123');
+        $workout->setAo(array("1" => "Spider Run"));
+        $workout->setBackblastUrl('http://someurl');
+        $member = new Member();
+        $member->setMemberId("1");
+        $member->setF3Name("Splinter");
+        $member->setAliases(null);
+        $workout->setPax(array("1" => $member));
+        $workout->setPaxCount("1");
+        $workout->setQ(array("1" => "Splinter"));
         $workout->setTitle('To be deleted');
+        $workout->setWorkoutDate("2023-02-06");
+		$workout->setWorkoutId('123');
 
         $this->workoutServiceMock->method('getWorkout')
                                  ->willReturn($workout);
